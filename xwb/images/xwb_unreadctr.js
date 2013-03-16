@@ -1,7 +1,7 @@
 /**
- * 未读消息js For DZ/DX
+ * unread js For DZ/DX
  * @author yaoying
- * @version $Id: xwb_unreadctr.js 728 2011-05-12 03:34:47Z yaoying $
+ * @version $Id: xwb_unreadctr.js 1013 2012-09-25 03:55:45Z yaoying $
  */
 if(!window.xwbUnreadCtr){
 	window.xwbUnreadCtr = {
@@ -11,7 +11,8 @@ if(!window.xwbUnreadCtr){
 			followers: 0,
 			dm: 0,
 			mentions: 0,
-			comments: 0
+			comments: 0,
+			oauth2expire: 0
 		},
 		
 		init: function(uid){

@@ -9,7 +9,7 @@
 <script language="javascript">
 function chgUninstallLink(){
 	var delete_data = document.getElementById('is_delete_tb').checked ? 0 : 1;
-	var url = '?step=1&delete_data='+delete_data;
+	var url = '?step=1&delete_data='+delete_data + '&tokenhash=<?php echo $tokenhash; ?>';
 	document.getElementById('uninstall_link').href=url;
 }
 </script>

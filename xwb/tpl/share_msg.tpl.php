@@ -68,7 +68,7 @@
                     <dt><a href="<?php echo XWB_plugin::getWeiboProfileLink($owbUserRs['id']);?>" target="_blank"><img src="<?php echo isset($owbUserRs['local_image_url']) ? $owbUserRs['local_image_url'] : XWB_plugin::getPluginUrl('images/bgimg/0.gif');?>"  /></a></dt>
                     <dd class="info">
                     	<h5><?php echo $owbUserRs['screen_name'];?></h5>
-                        <p class="adr"><span><a target="_blank" href="<?php echo XWB_plugin::getEntryURL('xwbSiteInterface.attention', "att_id={$owbUserRs['id']}");?>">加关注</a></span></p>
+                        <p class="adr"><span><a target="_blank" href="<?php echo XWB_plugin::getEntryURL('xwbSiteInterface.attention', "att_id={$owbUserRs['id']}&". XWB_TOKEN_NAME. "=". FORMHASH);?>">加关注</a></span></p>
                     </dd>
                     </dl>
                 </div>

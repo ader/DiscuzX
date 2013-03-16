@@ -9,7 +9,7 @@
  * @author yaoying<yaoying@staff.sina.com.cn>
  * @since 2010-06-08
  * @copyright SINA INC.
- * @version $Id: clientUser.class.php 645 2011-03-21 06:26:57Z yaoying $
+ * @version $Id: clientUser.class.php 1013 2012-09-25 03:55:45Z yaoying $
  */
 
 class clientUser 
@@ -120,6 +120,9 @@ class clientUser
 	function clearToken(){
 		$this->setOAuthKey(array(),true);
 		$this->setOAuthKey(array(),false);
+		$this->delInfo('sina_uid');
+		$this->delInfo('sina_name');
+		$this->delInfo('oauth2_expiretime');
 	}
 	
 	/**

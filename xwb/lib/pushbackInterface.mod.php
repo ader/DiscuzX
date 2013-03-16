@@ -4,7 +4,7 @@
  * 
  * @author yaoying
  * @since 2010-12-22
- * @version $Id: pushbackInterface.mod.php 836 2011-06-15 01:48:00Z yaoying $
+ * @version $Id: pushbackInterface.mod.php 982 2011-09-21 07:16:01Z yaoying $
  *
  */
 class pushbackInterface{
@@ -34,6 +34,8 @@ class pushbackInterface{
 		$lastUpdateTime = isset($res['xwb_pushback_lasttime']) ? (int)$res['xwb_pushback_lasttime'] : 0;
 		$nextUpdateTime = isset($res['xwb_pushback_nexttime']) ? (int)$res['xwb_pushback_nexttime'] : 0;
 		$fromid = (float)XWB_Plugin::pCfg('pushback_fromid');
+		
+		$tokenhash = xwb_token::make('pushback', true);
 		include XWB_P_ROOT.'/tpl/plugin_cfg_pushback.tpl.php';
 	}
 	
@@ -44,6 +46,10 @@ class pushbackInterface{
 	function doCfg4setAuthKey(){
 		if (!defined('XWB_S_IS_ADMIN') || !XWB_S_IS_ADMIN || !XWB_plugin::isRequestBy('POST')){
 			XWB_plugin::deny('');
+		}elseif(!xwb_token::checkInput('p','pushback', true)){
+			$ret = array(0,'令牌验证失败，请返回重试');
+			echo json_encode($ret);
+			exit();
 		}
 		$pushInstance = XWB_Plugin::O('pushbackCommunicator');
 		$res = $pushInstance->getAuthKey();
@@ -83,6 +89,8 @@ class pushbackInterface{
 	function doCfg4pushback(){
 		if (!defined('XWB_S_IS_ADMIN') || !XWB_S_IS_ADMIN || !XWB_plugin::isRequestBy('POST')){
 			XWB_plugin::deny('');
+		}elseif(!xwb_token::checkInput('p','pushback', true)){
+			XWB_plugin::showError('令牌验证失败，请返回重试');
 		}
 		
 		$is_pushback_open = 1;
@@ -121,7 +129,7 @@ class pushbackInterface{
 	 * 运行评论回推
 	 */
 	function forcePushback(){
-		//exit('NOT ALLOW YET.');
+		exit('NOT ALLOW YET.');
 		//error_reporting(E_ALL);
 		$pushInstance = XWB_Plugin::O('pushbackDispatcher');
 		if ( true == $pushInstance->prepare(false) ){

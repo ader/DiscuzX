@@ -4,7 +4,7 @@
  * @author xionghui<xionghui1@staff.sina.com.cn>
  * @since 2010-06-08
  * @copyright Xweibo (C)1996-2099 SINA Inc.
- * @version $Id: xwbUserProfile.class.php 836 2011-06-15 01:48:00Z yaoying $
+ * @version $Id: xwbUserProfile.class.php 974 2011-09-20 07:32:41Z yaoying $
  *
  */
 class xwbUserProfile{
@@ -24,7 +24,7 @@ class xwbUserProfile{
 			if( !isset($res['profile']) || empty($res['profile']) ){
 				$this->profile = array();
 			}else{
-				$this->profile = @json_decode(preg_replace('#(?<=[,\{\[])\s*("\w+"):(\d{6,})(?=\s*[,\]\}])#si', '${1}:"${2}"', $res['profile']), true);
+				$this->profile = @xwb_util_json::decode($res['profile'], true);
 				if(!is_array($this->profile)){
 					$this->profile = array();
 				}
@@ -84,7 +84,7 @@ class xwbUserProfile{
 			}
 			return array();
 		}
-		$object = @json_decode(preg_replace('#(?<=[,\{\[])\s*("\w+"):(\d{6,})(?=\s*[,\]\}])#si', '${1}:"${2}"', $this->info['profile']), true);
+		$object = @xwb_util_json::decode($this->info['profile'], true);
 		if (!$object ) {
 			if ($default !== null) {
 				return $default;

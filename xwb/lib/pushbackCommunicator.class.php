@@ -4,7 +4,7 @@
  * 
  * @author yaoying
  * @since 2010-12-22
- * @version $Id: pushbackCommunicator.class.php 807 2011-05-30 07:59:53Z yaoying $
+ * @version $Id: pushbackCommunicator.class.php 974 2011-09-20 07:32:41Z yaoying $
  *
  */
 class pushbackCommunicator{
@@ -187,7 +187,7 @@ class pushbackCommunicator{
 	 */
 	function _decodeResult(){
 		if( $this->httpcode == 200 ){
-			$this->result = json_decode(preg_replace('#(?<=[,\{\[])\s*("\w+"):(\d{6,})(?=\s*[,\]\}])#si', '${1}:"${2}"', $this->result), true);
+			$this->result = xwb_util_json::decode($this->result, true);
 		}
 		if( !is_array($this->result) ){
 			$this->result = array();

@@ -14,7 +14,11 @@
         	<div class="con-l">
                 <div class="binding">
                 	<a class="binding-btn binding-w" href="javascript:void(0)" onclick="window.top.location='<?php echo XWB_plugin::getEntryURL('xwbAuth.login');?>'"><span>绑定新浪微博</span></a>
+                	<?php if(XWB_plugin::pCfg('switch_to_xweibo') && XWB_plugin::pCfg('baseurl_to_xweibo')): ?>
+                    <a href="<?php echo XWB_plugin::pCfg('baseurl_to_xweibo'). 'index.php?m=account.goSinaReg'; ?>" target="_blank">注册新浪微博</a>
+                    <?php else: ?>
                     <a href="http://weibo.com/reg.php" target="_blank">注册新浪微博</a>
+                    <?php endif; ?>
                 </div>
             </div> 
             <div class="con-r">

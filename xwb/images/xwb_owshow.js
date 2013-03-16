@@ -1,12 +1,12 @@
 if(!window.xwbOw){
 	window.xwbOw = {
-		show: function(owUid, owName, profileUrl, showAttention){
+		show: function(owUid, owName, profileUrl, showAttention, tokenhash){
 			var fatherDom = document.getElementById('chart');
 			var p = document.createElement('p');
 			p.id = 'xwbofficewb';
 			//p.className = 'z';
 			if(showAttention && showAttention == 1){
-				p.innerHTML = this.tplAttentionButton(owUid) + this.tplOw(owName, profileUrl);
+				p.innerHTML = this.tplAttentionButton(owUid, tokenhash) + this.tplOw(owName, profileUrl);
 				
 			}else{
 				p.innerHTML = this.tplOw(owName, profileUrl);
@@ -25,10 +25,12 @@ if(!window.xwbOw){
 			       ].join('');
 		},
 		
-		tplAttentionButton: function(owUid){
+		tplAttentionButton: function(owUid, tokenhash){
 			return [
 		        	'<a href="xwb.php?m=xwbSiteInterface.attention&att_id=',
 		        	owUid,
+		        	'&tokenhash=',
+		        	tokenhash,
 		        	'" target="_blank" class="addfollow-btn"></a>'
 		       ].join('');
 		}

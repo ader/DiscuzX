@@ -4,7 +4,7 @@
  * 
  * @author xionghui
  * @author yaoying
- * @version $Id: xwb_uninstall.class.php 836 2011-06-15 01:48:00Z yaoying $
+ * @version $Id: xwb_uninstall.class.php 1007 2012-06-13 06:16:13Z yaoying $
  */
 class xwb_uninstall {
 	var $v = array();
@@ -33,7 +33,9 @@ class xwb_uninstall {
 		//根据不同的版本配置不同的HAC
 		switch ($ver) {
 			case '1.5' :
+			case '1.5.1' :
 			case '2' :
+			case '3' :
 				break;
 			default :
 				$this->error('不支持的站点版本： '.XWB_S_VERSION);
@@ -70,12 +72,18 @@ class xwb_uninstall {
 		$showTab = 'info';
 		$btn_enable = 'class="btn"';
 		$btn_name = '确定卸载';
-		$link = '?step=1&delete_data=0';
+		$tokenhash = xwb_token::make('xwbuninstall', false);
+		$link = '?step=1&delete_data=0&tokenhash='. $tokenhash;
 		include $this->tpl_dir.'/uninstall.php';
 		exit;
 	}
 	
 	function step1(){
+		$tokenhash = '';
+		if(!xwb_token::checkInput('g', 'xwbuninstall', false)){
+			echo 'XWB_TOKEN_HASH_CHECK_FAILURE!';
+			//exit();
+		}	
 		
 		$cfg = $this->getCfg();
 		
@@ -109,7 +117,7 @@ class xwb_uninstall {
 			//根据安装来源给出完成跳转链接
 			if( $this->_sess->getInfo('boot_referer') == 'admincp'){
 				$installtype = 'SC_'. XWB_S_CHARSET;
-				if (1.5 == XWB_S_VERSION) {
+				if (version_compare(XWB_S_VERSION, '2', '<')) {
 					//X1.5
 					$link= '../../admin.php?action=plugins&operation=pluginuninstall&dir=sina_xweibo&installtype='. $installtype. '&finish=1';
 				}else{

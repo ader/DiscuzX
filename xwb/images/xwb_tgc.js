@@ -53,7 +53,7 @@ var TipShowSign = function(TipData, params){
         TipData.isFriend ?
         '<a href="javascript:void(0)" class="tipGetCount-already-attention-btn"></a>'
         : '<a onclick="XWBcontrol.onAddFriendClick(event, \''
-        + params.SinaId + '\')" href="/xwb.php?m=xwbSiteInterface.attention&amp;att_id='
+        + params.SinaId + '\')" href="' + window._xwb_cfg_data['attentionUrl'] + '&amp;att_id='
         + params.SinaId + '" target="_blank" class="tipGetCount-attention-btn"></a>'
         : '';
 }

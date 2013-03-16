@@ -11,7 +11,7 @@ $bindUrl = XWB_plugin::getEntryURL("xwbSiteInterface.bind");
 $signerUrl = XWB_plugin::getEntryURL("xwbSiteInterface.signer");
 $authUrl = XWB_plugin::getEntryURL("xwbAuth.login");
 $getTipsUrl = XWB_plugin::getEntryURL("xwbSiteInterface.getTips");
-$attentionUrl = XWB_plugin::getEntryURL("xwbSiteInterface.attention");
+$attentionUrl = XWB_plugin::getEntryURL("xwbSiteInterface.attention", XWB_TOKEN_NAME. '='. FORMHASH);
 $wbxUrl = '';
 $xwb_loadScript2 =  XWB_plugin::getPluginUrl('images/xwb.js');
 $xwb_css_base = XWB_plugin::getPluginUrl('images/xwb_base.css');

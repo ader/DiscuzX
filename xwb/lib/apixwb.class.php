@@ -4,7 +4,7 @@
  * @author junxiong<junxiong@staff.sina.com.cn>
  * @since 2011-03-07
  * @copyright Xweibo (C)1996-2099 SINA Inc.
- * @version $Id: apixwb.class.php 724 2011-05-10 05:28:00Z yaoying $
+ * @version $Id: apixwb.class.php 974 2011-09-20 07:32:41Z yaoying $
  *
  */
 class apixwb
@@ -85,7 +85,7 @@ class apixwb
 		$time_process = array_sum(explode (' ', $time_end)) - array_sum(explode (' ', $time_start));
 
         if($toArray) {
-            $result = json_decode(preg_replace('#(?<=[,\{\[])\s*("\w+"):(\d{6,})(?=\s*[,\]\}])#si', '${1}:"${2}"', $result), true);
+		$result = xwb_util_json::decode($result, true);
         }
 
         $code = $this->http->getState();

@@ -1625,7 +1625,7 @@ NS.util.extend(NS, {
 			if(1 == CFG.switchToStd){
 				return CFG.baseurlToStd + 'index.php?m=ta&id=' + sina_uid;
 			}else{
-				return 'http://weibo.com/' + sina_uid;
+				return 'http://weibo.com/u/' + sina_uid;
 			}
 		},
 

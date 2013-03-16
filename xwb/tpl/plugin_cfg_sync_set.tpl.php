@@ -67,6 +67,7 @@
     	<div class="wrap-inner">
         	<h3 class="main-title">内容同步关联</h3>
             <form action="<?php echo XWB_plugin::getEntryURL("xwbSiteInterface.doPluginCfg4Sync");?>" id="siteRegFrom"  method="post" target="xwbHideFrame">
+            <input type="hidden" name="<?php echo XWB_TOKEN_NAME; ?>" value="<?php echo $tokenhash; ?>" />
             	<ul>
                 	<li>
                     	<p>开启以下内容同步功能。<span>（用户发信息时可选择，开启默认为同步。需要该用户绑定新浪微博）</span></p>

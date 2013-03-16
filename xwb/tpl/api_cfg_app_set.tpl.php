@@ -21,11 +21,12 @@
         {
             var href = action ? '<?php echo XWB_plugin::getEntryURL("xwbApiInterface.openApi");?>' : '<?php echo XWB_plugin::getEntryURL("xwbApiInterface.closeApi");?>';
             var param = action ? 'url=' + encodeURIComponent($id('url').value) : '';
+            var tokenhash = '<?php echo XWB_TOKEN_NAME. '='. $tokenhash; ?>';
             var sign = action ? true : confirm('确定要关闭吗？');
             if(sign) {
                 XWBcontrol.util.connect(href + '&' + Math.random(), {
                     method : 'POST',
-                    data : param,
+                    data : param + '&' + tokenhash,
                     success : function(rst) {
                         if (rst.errno) {
                             var err = getMsg(rst.errno) ? getMsg(rst.errno) : rst.err;

@@ -1,6 +1,6 @@
 <?php
 /*
- * @version $Id: cfg.php 734 2011-05-13 07:06:29Z yaoying $
+ * @version $Id: cfg.php 1025 2012-09-27 02:36:16Z yaoying $
  */
 /// 安装配置文件
 //-----------------------------------------------------------------------
@@ -32,7 +32,7 @@ $_xwb_install['hack_flag']	= array(
 //-----------------------------------------------------------------------
 
 /// 环境的版本检查选项 >=1 <=2
-$_xwb_install['site_ver']	= array('1.5','2');
+$_xwb_install['site_ver']	= array('1.5','3');
 $_xwb_install['php_ver']	= array('4.3','*');
 
 /// 允许的 字符集 大写
@@ -85,7 +85,7 @@ define('XWB_REMOTE_API_LOG', false);
 //远程API通讯超时限制
 define('XWB_REMOTE_API_TIME_VALIDATY', 800);
 
-//http适配器。可选值有'curl'、'fsockopen'（默认）
+//http适配器。可选值有'curl'（默认）、'fsockopen'
 define('XWB_HTTP_ADAPTER', '%s');
 
 /*（默认不起作用）

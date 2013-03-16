@@ -6,7 +6,7 @@
  * @author yaoying
  * @author junxiong
  * @since 2011-05-13
- * @version $Id: hook.class.php 848 2011-06-22 07:09:17Z yaoying $
+ * @version $Id: hook.class.php 1015 2012-09-25 03:58:04Z yaoying $
  */
 
 /**
@@ -61,10 +61,11 @@ class plugin_sina_xweibo_x2{
 	 */
 	function _get_unread_global_footer_content(){
 		global $_G;
-		if(!$_G['uid'] || !core_sina_xweibo_x2::pCfg('switch_to_xweibo')){
+		if(!$_G['uid']){
 			return '';
 		}
 		$std_url = core_sina_xweibo_x2::pCfg('baseurl_to_xweibo');
+		$pluginid = $this->pluginid;
 		include template($this->pluginid. ':global_footer_unread');
 		return $return;
 	}
@@ -211,9 +212,6 @@ class plugin_sina_xweibo_x2{
 	 */
 	function _get_unread_global_usernav_extra1_content(){
 		global $_G;
-		if(!core_sina_xweibo_x2::pCfg('switch_to_xweibo')){
-			return '';
-		}
 		return <<<EOF
 		<span id="xwb_allsum_{$_G['uid']}_container" style="display: none">
 		    <span class="pipe">|</span><a id="xwb_unread_{$_G['uid']}" href="#" onmouseover="showMenu(this.id)" class="new" style="background-image: url(xwb/images/bgimg/icon_logo_xweibo.png);">&#24494;&#21338;(<span id="xwb_allsum_{$_G['uid']}">0</span>)</a>
@@ -232,12 +230,11 @@ EOF;
 		if(isset($_G['gp_mod']) && $_G['gp_mod'] == 'space'){
 			$addStyle = 'vertical-align:-5px;margin-top: 2px;';
 		}else{
-			$addStyle = 'vertical-align:-5px;';
+			$addStyle = 'vertical-align:-5px;padding-right:5px;';
 		}
 		return <<<EOF
 			<span class="pipe">|</span>
 			<a href="home.php?mod=spacecp&ac=plugin&id={$this->pluginid}:home_binding" target="_blank"><img style="{$addStyle}" src="xwb/images/bgimg/sina_bind_btn.png" /></a>
-			&nbsp;
 EOF;
 	}
 	
@@ -776,7 +773,7 @@ class plugin_sina_xweibo_x2_home extends plugin_sina_xweibo_x2{
 				$xweibourl = $xweibourl_ta_friends = $xweibourl_ta_followers = '';
 			}
 			
-			$profile = json_decode(preg_replace('#(?<=[,\{\[])\s*("\w+"):(\d{6,})(?=\s*[,\]\}])#si', '${1}:"${2}"', $result['profile']), true);
+			$profile = xwb_util_json::decode($result['profile'], true);
 			if(isset($profile['tipUserInfo']['friends_count'])){
 				if($switch){
 					$output = '<img height="16" width="16" src="'. $this->xwb_p_rootname. '/images/bgimg/icon_logo.png" />&nbsp;<a href="'. 
@@ -1491,7 +1488,7 @@ class tpl_sina_xweibo_x2{
 		if(core_sina_xweibo_x2::pCfg('switch_to_xweibo') && !empty($xweibourl)){
 			$xweibourl_ta = $xweibourl. '/index.php?m=ta&id='. $sina_uid;
 		}else{
-			$xweibourl_ta = 'http://weibo.com/'. $sina_uid;
+			$xweibourl_ta = 'http://weibo.com/u/'. $sina_uid;
 		}
 		return $xweibourl_ta;
 	}
