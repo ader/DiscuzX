@@ -85,7 +85,7 @@ define('ADMINSCRIPT', 'admin.php');
 		$plugin['name'] = dhtmlspecialchars($plugin['name']);
 		$plugin['version'] = dhtmlspecialchars($plugin['version']);
 		$plugin['copyright'] = dhtmlspecialchars($plugin['copyright']);
-		$plugin['submenuitem'] = implode('', $plugin['submenuitem']);
+		$plugin['submenuitem'] = implode(' | ', $plugin['submenuitem']);
 		$plugin_list[$plugin['identifier']] = $plugin;
 	}
 		/*
