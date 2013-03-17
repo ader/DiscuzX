@@ -2,7 +2,7 @@
 
 /**
  * 新浪微博签名替换函数
- * @version $Id: xwb_format_signature.function.php 689 2011-05-04 06:44:17Z yaoying $
+ * @version $Id: xwb_format_signature.function.php 1004 2012-06-11 10:32:46Z yaoying $
  * @param string $s
  */
 function xwb_format_signature($s) {
@@ -13,7 +13,7 @@ function xwb_format_signature($s) {
 	if(XWB_plugin::pCfg('switch_to_xweibo') && !empty($xweibourl)){
 		$xweibourl_ta = $xweibourl. '/index.php?m=ta&id=';
 	}else{
-		$xweibourl_ta = 'http://weibo.com/';
+		$xweibourl_ta = 'http://weibo.com/u/';
 	}	
 	
 	$p = "#&lt;-sina_sign,(\d+),([a-z0-9]+),(\d+)-&gt;#sim";

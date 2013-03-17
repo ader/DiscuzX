@@ -3,7 +3,7 @@
  * 安装控制类 For DiscuzX
  * @author xionghui
  * @author yaoying
- * @version $Id: xwb_install.class.php 836 2011-06-15 01:48:00Z yaoying $
+ * @version $Id: xwb_install.class.php 1025 2012-09-27 02:36:16Z yaoying $
  *
  */
 class xwb_install {
@@ -87,11 +87,14 @@ class xwb_install {
 		
 		//生成系统配置文件
 		$apiurl = str_replace('/install', '', $_G['siteurl']. 'xapi.php');
-		if(function_exists('fsockopen')){
+		if(function_exists('curl_exec') && function_exists('curl_init')){
+			$http_adp_name = 'curl';
+		}elseif(function_exists('fsockopen') && extension_loaded('openssl')){
 			$http_adp_name = 'fsockopen';
 		}else{
-			$http_adp_name = 'curl';
+			$this->error('“函数fsockopen+扩展openssl”、或者“扩展curl中的函数curl_exec+函数curl_init”两个检测都不通过，插件要求至少有一个组合可用');
 		}
+		
 		$appCfg = "<?php\n".sprintf($this->v['app_cfg_tpl'], date("Y-m-d H:i:s "), $appkey, $appsecret, $apiurl, $http_adp_name )."\n?>";
 		if (!file_put_contents(XWB_P_ROOT.'/app.cfg.php', $appCfg)){
 			$this->error('无法生成系统定义配置文件，请检查文件 '. XWB_P_ROOT.'/app.cfg.php' .'的权限');
@@ -120,7 +123,7 @@ class xwb_install {
 			//根据安装来源给出完成跳转链接
 			if( $this->_sess->getInfo('boot_referer') == 'admincp'){
 				$installtype = 'SC_'. XWB_S_CHARSET;
-				if (1.5 == XWB_S_VERSION) {
+				if (version_compare(XWB_S_VERSION, '2', '<')) {
 					//X1.5
 					$finish_link = '../../admin.php?action=plugins&operation=plugininstall&dir=sina_xweibo&installtype='. $installtype. '&finish=1';
 				}else{
@@ -245,7 +248,12 @@ class xwb_install {
 			$tips[] = array(0,'当前PHP版本为: '.PHP_VERSION.' 当前插件支持版本： '.$this->v['php_ver'][0].' - '. $this->v['php_ver'][1]);
 		}
 		
-		
+		if ( $this->_verChk(XWB_S_VERSION,$this->v['site_ver']) ){
+			$tips[] = array(1,'当前'.XWB_S_NAME.'版本为: '.XWB_S_VERSION.' ');
+		}else{
+			$st = false;
+			$tips[] = array(0,'当前'.XWB_S_NAME.'版本为: '.XWB_S_VERSION.' 当前插件支持版本： '.$this->v['site_ver'][0].' - '. $this->v['site_ver'][1]);
+		}
 		
 		$s_charset = str_replace('-','',strtoupper(XWB_S_CHARSET));
 		if ( in_array($s_charset,$this->v['charset']) ){
@@ -278,13 +286,13 @@ class xwb_install {
 			}
 		}
 		//http适配器特别检查
-		if(function_exists('fsockopen')){
-			$tips[] = array(1,'函数: fsockopen 可用 ');
-		}elseif(function_exists('curl_exec') && function_exists('curl_init')){
-			$tips[] = array(1,'函数: curl_exec + curl_init 可用 ');
+		if(function_exists('curl_exec') && function_exists('curl_init')){
+			$tips[] = array(1,'扩展curl中的curl_exec+curl_init：可用 ');
+		}elseif(function_exists('fsockopen') && extension_loaded('openssl')){
+			$tips[] = array(1,'函数fsockopen+扩展openssl：可用 ');
 		}else{
 			$st = false;
-			$tips[] = array(0,'函数fsockopen、或者扩展curl中的curl_exec+curl_init都不可用，插件要求至少有一个组合可用');
+			$tips[] = array(0,'“函数fsockopen+扩展openssl”、或者“扩展curl中的函数curl_exec+函数curl_init”两个检测都不通过，插件要求至少有一个组合可用');
 		}
 		//-------------------------------------------------------------------
 		//文件权限检查

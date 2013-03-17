@@ -16,7 +16,7 @@
 			<item id="datatables"><![CDATA[]]></item>
 			<item id="directory"><![CDATA[sina_xweibo_x2/]]></item>
 			<item id="copyright"><![CDATA[Sina Inc.]]></item>
-			<item id="version"><![CDATA[2.1]]></item>
+			<item id="version"><![CDATA[2.1.6]]></item>
 			<item id="__modules">
 				<item id="0">
 					<item id="name"><![CDATA[hook]]></item>

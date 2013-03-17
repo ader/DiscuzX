@@ -4,7 +4,7 @@
  * @author yaoying
  * @author junxiong
  * @copyright SINA INC.
- * @version $Id: plugin.env.php 578 2011-01-19 02:34:16Z yaoying $
+ * @version $Id: plugin.env.php 1013 2012-09-25 03:55:45Z yaoying $
  *
  */
 
@@ -37,12 +37,17 @@ $GLOBALS['xwb_tips_type'] = '' ;
 $sess = XWB_plugin::getUser();
 
 if ( !defined('IN_XWB_INSTALL_ENV') ){
+	$token_cleared = false;
 	if( defined('XWB_S_UID') &&  XWB_S_UID ){
 		$bInfo = XWB_plugin::getBindInfo ();
 		if (!empty ($bInfo) && is_array ($bInfo)) {
 			$keys = array ('oauth_token' => $bInfo ['token'], 'oauth_token_secret' => $bInfo ['tsecret'] );
 			$sess->setInfo( 'sina_uid', $bInfo ['sina_uid'] );
 			$sess->setOAuthKey( $keys, true );
+		}else{
+			$sess->clearToken();
+			setcookie ('xwb_tips_type', '', time () - 3600);
+			$token_cleared = true;
 		}
 	}
 	
@@ -52,9 +57,11 @@ if ( !defined('IN_XWB_INSTALL_ENV') ){
 		setcookie ('xwb_tips_type', '', time () - 3600);
 	}
 	
-	$xwb_token = $sess->getToken ();
-	if ( empty($xwb_token) ) {
-		$sess->clearToken ();
-		setcookie ('xwb_tips_type', '', time () - 3600);
+	if(!$token_cleared){
+		$xwb_token = $sess->getToken ();
+		if ( empty($xwb_token) ) {
+			$sess->clearToken ();
+			setcookie ('xwb_tips_type', '', time () - 3600);
+		}
 	}
 }

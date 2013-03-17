@@ -6,7 +6,7 @@
  * @author xionghui
  * @author junxiong
  * @since 2010-6
- * @version $Id: xwb_plugins_publish.class.php 836 2011-06-15 01:48:00Z yaoying $
+ * @version $Id: xwb_plugins_publish.class.php 1024 2012-09-26 10:41:32Z yaoying $
  *
  */
 class xwb_plugins_publish{
@@ -70,6 +70,7 @@ class xwb_plugins_publish{
 		}
 		
 		$wb = XWB_plugin::getWB();
+		$wb->is_exit_error = false;
 		$ret = array();
 		
 		// 同步到微博
@@ -95,8 +96,8 @@ class xwb_plugins_publish{
 			
 			//插入“已同步到......”到指定pid中。
 			if( XWB_plugin::pCfg('wb_addr_display') && (!isset($GLOBALS['_G']['gp_special']) || $GLOBALS['_G']['gp_special'] != 127) ){
-				$redirectURL = (XWB_plugin::pCfg('switch_to_xweibo') && XWB_plugin::pCfg('baseurl_to_xweibo')) ? rtrim(XWB_plugin::pCfg('baseurl_to_xweibo'), '/') . "/index.php?m=show&id={$mid}" : XWB_API_URL. $ret['user']['id']. '/statuses/'. $mid;
-
+				$redirectURL = $this->getRedirectWeiboLink($ret['user']['id'], $mid);
+				
 				$insertSyncUBB = '[size=2][color=gray]'. ' [img]' . XWB_plugin::getPluginUrl('images/bgimg/icon_logo.png') . '[/img] '.
                             XWB_plugin::L('xwb_topic_has_sycn_to_new') . ' [url=' . $redirectURL . ']' . $_G['username'] .
                             XWB_plugin::L('xwb_topic_has_sycn_to_new_end') . '[/url][/color][/size]';
@@ -182,6 +183,7 @@ class xwb_plugins_publish{
 
         // 同步到微博
         $wb = XWB_plugin::getWB();
+        $wb->is_exit_error = false;
 		$ret = array();
         
 		if ( ! empty($pic))
@@ -247,6 +249,7 @@ class xwb_plugins_publish{
 		
 		//同步到微博
 		$wb = XWB_plugin::getWB();
+		$wb->is_exit_error = false;
 		$rs = $wb->comment($mid, $message,null, false);
 		
 		if ( isset($rs['id']) && !empty($rs['id']) ) {
@@ -465,6 +468,7 @@ class xwb_plugins_publish{
 		
 		$db = XWB_plugin::getDB();
 		$wb = XWB_plugin::getWB();
+		$wb->is_exit_error = false;
 		$ret = array();
 		
 		// 同步到微博
@@ -482,7 +486,7 @@ class xwb_plugins_publish{
 			
 			//插入“已同步到......”到指定id中。
 			if( XWB_plugin::pCfg('wb_addr_display') ){
-				$redirectURL = (XWB_plugin::pCfg('switch_to_xweibo') && XWB_plugin::pCfg('baseurl_to_xweibo')) ? rtrim(XWB_plugin::pCfg('baseurl_to_xweibo'), '/') . "/index.php?m=show&id={$mid}" : XWB_API_URL. $ret['user']['id']. '/statuses/'. $mid;
+				$redirectURL = $this->getRedirectWeiboLink($ret['user']['id'], $mid);
 
 				$insertSyncHTML = "\n\r". '<DIV><FONT color="#808080" size=2><IMG src="'. XWB_plugin::getPluginUrl('images/bgimg/icon_logo.png') . '">&nbsp;'. XWB_plugin::L('xwb_topic_has_sycn_to'). '&nbsp;<a href="'. $redirectURL. '" target="_blank">'. $_G['username']. XWB_plugin::L('xwb_topic_has_sycn_to_new_end'). '</A></FONT></DIV>';
 				$insertSyncHTML = mysql_real_escape_string( $insertSyncHTML );
@@ -518,6 +522,7 @@ class xwb_plugins_publish{
 		
 		//同步到微博
 		$wb = XWB_plugin::getWB();
+		$wb->is_exit_error = false;
 		$rs = $wb->comment($mid, $message,null, false);
 		
 	}
@@ -537,6 +542,7 @@ class xwb_plugins_publish{
 		
 		$db = XWB_plugin::getDB();
 		$wb = XWB_plugin::getWB();
+		$wb->is_exit_error = false;
 		$ret = array();
 		
 		// 同步到微博
@@ -575,6 +581,7 @@ class xwb_plugins_publish{
 		
 		//同步到微博
 		$wb = XWB_plugin::getWB();
+		$wb->is_exit_error = false;
 		$rs = $wb->comment($mid, $message,null, false);
 		
 		if ( isset($rs['id']) && !empty($rs['id']) ) {
@@ -607,6 +614,7 @@ class xwb_plugins_publish{
 		
 		$db = XWB_plugin::getDB();
 		$wb = XWB_plugin::getWB();
+		$wb->is_exit_error = false;
 		$ret = array();
 		
 		// 同步到微博
@@ -624,8 +632,8 @@ class xwb_plugins_publish{
 			
 			//插入“已同步到......”到指定id中。
 			if( XWB_plugin::pCfg('wb_addr_display') ){
-				$redirectURL = (XWB_plugin::pCfg('switch_to_xweibo') && XWB_plugin::pCfg('baseurl_to_xweibo')) ? rtrim(XWB_plugin::pCfg('baseurl_to_xweibo'), '/') . "/index.php?m=show&id={$mid}" : XWB_API_URL. $ret['user']['id']. '/statuses/'. $mid;
-
+				$redirectURL = $this->getRedirectWeiboLink($ret['user']['id'], $mid);
+				
 				$insertSyncHTML = "\n\r". '<DIV><FONT color="#808080" size=2><IMG src="'. XWB_plugin::getPluginUrl('images/bgimg/icon_logo.png') . '">&nbsp;'. XWB_plugin::L('xwb_topic_has_sycn_to'). '&nbsp;<a href="'. $redirectURL. '" target="_blank">'. $_G['username']. XWB_plugin::L('xwb_topic_has_sycn_to_new_end'). '</A></FONT></DIV>';
 				$insertSyncHTML = mysql_real_escape_string( $insertSyncHTML );
 				
@@ -708,6 +716,7 @@ class xwb_plugins_publish{
 		$message .= $link;
 		
 		$wb = XWB_plugin::getWB();
+		$wb->is_exit_error = false;
 		// 同步到微博
 		if ( !empty($pic) ) {
 			$ret = $wb->upload($message, $pic, null, null, false);
@@ -757,6 +766,7 @@ class xwb_plugins_publish{
 		
 		//同步到微博
 		$wb = XWB_plugin::getWB();
+		$wb->is_exit_error = false;
 		$rs = $wb->comment($mid, $message,null, false);
 		
 	}
@@ -813,5 +823,38 @@ class xwb_plugins_publish{
 		return false;
 	}
 	
+	/**
+	 * 通过微博（评论、私信）ID获取其MID
+	 * @param string $id
+	 * @return string 如果没有查询到，就返回空值
+	 */
+	function querymid($id){
+		$wb = XWB_plugin::getWB();
+		$wb->is_exit_error = false;
+		$res = $wb->querymid($id);
+		if(isset($res['error']) || !isset($res['mid'])){
+			return '';
+		}
+		return $res['mid'];
+	}
+	
+	/**
+	 * 获取跳转到单条微博的链接
+	 * @param string $id
+	 * @return string
+	 */
+	function getRedirectWeiboLink($sina_uid, $id){
+		if(XWB_plugin::pCfg('switch_to_xweibo') && XWB_plugin::pCfg('baseurl_to_xweibo')){
+			return rtrim(XWB_plugin::pCfg('baseurl_to_xweibo'), '/') . "/index.php?m=show&id={$id}";
+		}
+		
+		$final_mid = $this->querymid($id);
+		if(!empty($final_mid)){
+			return 'http://weibo.com/'. $sina_uid. '/'. $final_mid;
+		}else{
+			return 'http://weibo.com/'. $sina_uid;
+		}
+		
+	}
 	
 }

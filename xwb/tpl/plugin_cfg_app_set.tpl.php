@@ -231,6 +231,7 @@
 <body>
     <div id="app_set" class="set-wrap">
         <form action="<?php echo XWB_plugin::getEntryURL("xwbSiteInterface.doPluginCfg");?>" onsubmit="return beforeSubmit();" id="siteRegFrom"  method="post" target="xwbHideFrame">
+    	<input type="hidden" name="<?php echo XWB_TOKEN_NAME; ?>" value="<?php echo $tokenhash; ?>" />
     	<div class="wrap-inner">
         	<h3 class="main-title">帐号相关</h3>
 			<div class="set-s1">
@@ -310,6 +311,11 @@
             	<div class="set-s3-one reset-mar">
             		<p>绑定页活跃用户数据更新间隔:</p>
                 	<input class="input-box box-w1" name="pluginCfg[wbx_huwb_update_time]" type="text" value="<?php echo intval(XWB_plugin::pCfg('wbx_huwb_update_time'));?>" />
+                	<label>小时</label>
+            	</div>
+            	<div class="set-s3-one reset-mar">
+            		<p>当OAuth2授权剩余多少小时，对用户提醒及时重新授权？0表示永久不提示:</p>
+                	<input class="input-box box-w1" name="pluginCfg[oauth2_expire_notice]" type="text" value="<?php echo intval(XWB_plugin::pCfg('oauth2_expire_notice'));?>" />
                 	<label>小时</label>
             	</div>
             </div>

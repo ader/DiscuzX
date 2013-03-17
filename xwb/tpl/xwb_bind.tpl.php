@@ -1,3 +1,7 @@
+<?php 
+if (!defined('IS_IN_XWB_PLUGIN')) {die('access deny!');}
+$screenName = htmlspecialchars($screenName);
+?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -38,6 +42,7 @@
         	<div class="con-l">
         	
         		<form id="userProfileBind" action="<?php echo XWB_plugin::getEntryURL('xwbSiteInterface.setUserProfileBind');?>" method="post" target="xwbSiteRegister" >
+        		<input type="hidden" name="<?php echo XWB_TOKEN_NAME; ?>" value="<?php echo $sync_tokenhash; ?>" />
             	<div class="set-sle">
                 	<div class="choice">
                     	<label for="part1">
@@ -71,10 +76,30 @@
                 </form>
                 
                 <form id="unbindFrm" action="<?php echo XWB_plugin::getEntryURL('xwbSiteInterface.unbind');?>" method="post" target="xwbSiteRegister" >
+                <input type="hidden" name="<?php echo XWB_TOKEN_NAME; ?>" value="<?php echo $unbind_tokenhash; ?>" />
                 <p>已经绑定新浪微博：<strong><a href="<?php echo XWB_plugin::getWeiboProfileLink($domain); ?>" target="_blank"><?php echo $screenName;?></a></strong>
                     <a href="javascript:void(0)" onclick="showMsg('bind')">解除绑定</a>
                 </p>
                 </form>
+                
+                <p>
+                <?php if(!isset($userPorfile['oauth2_expiretime'])): ?>
+					 没有授权有效时间。
+                <?php else: ?>
+                	<?php 
+                		$day = 0;
+                		$remain_time = intval(($userPorfile['oauth2_expiretime'] - TIMESTAMP) / 60 / 60);
+                		if($remain_time > 24){
+                			$day = intval($remain_time / 24);
+                			$remain_time -= ($day * 24);
+                		}
+                	?>
+					授权有效期剩余<?php if($day > 0): echo $day; ?>天<?php endif; ?><?php echo $remain_time; ?>小时。
+					<?php if($expire_notice): ?>即将失效！<?php endif; ?>
+                <?php endif; ?>
+                <a href="<?php echo XWB_plugin::getEntryURL('xwbAuth.login');?>" target="_blank" title="延长授权前，请确定当前在weibo.com下已经登录为<?php echo $screenName;?>。如不能确定，请到weibo.com退出登录，再返回此处延长授权，否则将可能造成异常。">点击延长授权</a>
+                </p>
+                
             </div>
             <div class="con-r">
                 <?php if ($isBind && ! empty($owbUserRs)):?>
@@ -83,9 +108,9 @@
                     <div class="users">
                     	<a href="<?php echo XWB_plugin::getWeiboProfileLink($owbUserRs['id']);?>" target="_blank"><img alt="官方微博头像" src="<?php echo $owbUserRs['local_image_url']?$owbUserRs['local_image_url']:XWB_plugin::getPluginUrl('images/bgimg/0.gif');?>" /></a>
                         <div class="user-info">
-                            <p><?php echo $owbUserRs['screen_name'];?></p>
+                            <p><?php echo htmlspecialchars($owbUserRs['screen_name']);?></p>
                             <?php if($owbUserRs['id'] != $domain): ?>
-                            <a id="ocFriend" class="addfollow-btn <?php echo TRUE === $friendship?'hidden':'';?>"  target="_blank" href="<?php echo XWB_plugin::getEntryURL('xwbSiteInterface.attention', "att_id={$owbUserRs['id']}");?>" onclick="setFriend(this)"></a>
+                            <a id="ocFriend" class="addfollow-btn <?php echo TRUE === $friendship?'hidden':'';?>"  target="_blank" href="<?php echo XWB_plugin::getEntryURL('xwbSiteInterface.attention', "att_id={$owbUserRs['id']}&". XWB_TOKEN_NAME. "=". FORMHASH);?>" onclick="setFriend(this)"></a>
                             <a id="ocFriend_ed" class="already-addfollow-btn <?php echo TRUE !== $friendship?'hidden':'';?>" href="javascript:void(0)"></a>
                             <?php endif; ?>
                         </div>
@@ -99,10 +124,10 @@
                     <div class="users">
                         <a href="<?php echo XWB_plugin::getWeiboProfileLink($value['sina_uid']); ?>" target="_blank"><?php echo $value['avatar'];?></a>
                         <div class="user-info">
-                            <p><?php echo XWB_plugin::convertEncoding($value['username'], XWB_S_CHARSET, 'UTF-8');?></p>
+                            <p><?php echo htmlspecialchars(XWB_plugin::convertEncoding($value['username'], XWB_S_CHARSET, 'UTF-8'));?></p>
                             <?php if($value['sina_uid'] != $domain): ?>
                                 <?php if($isBind):?>
-                                <a id="huFriend" class="addfollow-btn <?php echo TRUE === $value['friends']?'hidden':'';?>" target="_blank" href="<?php echo XWB_plugin::getEntryURL('xwbSiteInterface.attention', "att_id={$value['sina_uid']}");?>" onclick="setFriend(this)"></a>
+                                <a id="huFriend" class="addfollow-btn <?php echo TRUE === $value['friends']?'hidden':'';?>" target="_blank" href="<?php echo XWB_plugin::getEntryURL('xwbSiteInterface.attention', "att_id={$value['sina_uid']}&". XWB_TOKEN_NAME. "=". FORMHASH);?>" onclick="setFriend(this)"></a>
                                 <?php else:?>
                                 <a class="addfollow-btn" href="<?php echo XWB_plugin::getWeiboProfileLink($value['sina_uid']); ?>"></a>
                                 <?php endif;?>
@@ -139,6 +164,7 @@
 		<div></div>
 	</div>
 </div>
+
 <!--保存异常提示-->
 <div class="pop-win win-w fixed-pop hidden" id="popMsgErr">
 	<div class="pop-t">
@@ -161,6 +187,7 @@
 		<div></div>
 	</div>
 </div>
+
 <!--解除绑定提示-->
 <div class="pop-win win-w fixed-pop hidden" id="popMsgUbind">
 	<div class="pop-t">
@@ -186,5 +213,6 @@
 		<div></div>
 	</div>
 </div>
+
 </body>
 </html>

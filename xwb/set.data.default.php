@@ -2,7 +2,7 @@
 /**
  * 插件设置默认配置文件和参数
  * 安装程序将根据此文件，自动创建或者合并已有的插件设置文件
- * @version $Id: set.data.default.php 791 2011-05-26 02:42:49Z yaoying $
+ * @version $Id: set.data.default.php 1013 2012-09-25 03:55:45Z yaoying $
  */
 $__XWB_SET=array (
   /* 同步成功后，在同步的主题贴/日志/门户文章中加入同步的微薄地址 */
@@ -99,5 +99,6 @@ $__XWB_SET=array (
   'space_card_weiboinfo' => 1,
   /* （仅用于X2）是否在论坛首页显示官方微博和关注页面 */
   'display_ow_in_forum_index' => 0,
+  /* 授权剩余多少小时的时候，进行对用户的提示？0表示永久不提示 */
+  'oauth2_expire_notice' => 0,
 );
-?>

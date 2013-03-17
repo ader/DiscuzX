@@ -4,7 +4,7 @@
  * @author xionghui<xionghui1@staff.sina.com.cn>
  * @since 2010-06-08
  * @copyright Xweibo (C)1996-2099 SINA Inc.
- * @version $Id: xwbAuth.mod.php 809 2011-05-31 02:38:26Z yaoying $
+ * @version $Id: xwbAuth.mod.php 1019 2012-09-26 08:52:36Z yaoying $
  *
  */
 class xwbAuth {
@@ -49,26 +49,31 @@ class xwbAuth {
 			XWB_plugin::redirect($siteUrl, 3);
 		}
 		
+		//state校验
+		$state = array();
+		parse_str( base64_decode(urldecode(XWB_plugin::V('g:state'))), $state);
+		if(!isset($state['token']) || empty($state['token']) || $state['token'] != $sess->getInfo('xweibo_oauthlogin')){
+			XWB_plugin::showError('来源校验失败，请重试。');
+		}
+		
 		$sess->setOAuthKey(array(),true);
 		//--------------------------------------------------------------------
 		$wbApi		= XWB_plugin::getWB();
 		$db			= XWB_plugin::getDB();
-		$last_key	= $wbApi->getAccessToken(XWB_plugin::V('r:oauth_verifier')) ;
+		$wbApi->is_exit_error = true;
+		$last_key	= $wbApi->getAccessToken(XWB_plugin::V('g:code'), array('redirect_uri'=>XWB_plugin::getEntryURL('xwbAuth.authCallBack'))) ;
 		
-		//print_r($last_key);
-		if( !isset($last_key['oauth_token']) || !isset($last_key['oauth_token_secret']) ){
-			$api_error_origin = isset($last_key['error']) ? $last_key['error'] : 'UNKNOWN ERROR. MAYBE SERVER CAN NOT CONNECT TO SINA API SERVER';
-			$api_error = ( isset($last_key['error_CN']) && !empty($last_key['error_CN']) && 'null' != $last_key['error_CN'] ) ? $last_key['error_CN'] : '';
-			
-			XWB_plugin::LOG("[WEIBO CLASS]\t[ERROR]\t#{$wbApi->req_error_count}\t{$api_error}\t{$wbApi->last_req_url}\tERROR ARRAY:\r\n".print_r($last_key, 1));
-			XWB_plugin::showError("服务器获取Access Token失败；请稍候再试。<br />错误原因：{$api_error}[{$api_error_origin}]");
+		if( !isset($last_key['oauth_token'])){
+			XWB_plugin::showError("服务器解析Access Token失败，请重试。");
 		}
 		
 		$sess->setOAuthKey($last_key, true);
 		$wbApi->setConfig();
-		$uInfo = $wbApi->verifyCredentials();
+		$uInfo = $wbApi->verifyCredentials($last_key['uid']);
 		$sess->setInfo('sina_uid', $uInfo['id']);
 		$sess->setInfo('sina_name', $uInfo['screen_name']);
+		$oauth2_expiretime = TIMESTAMP + $last_key['expires_in'];
+		$sess->setInfo('oauth2_expiretime', $oauth2_expiretime);
 		//print_r($uInfo);
 		//--------------------------------------------------------------------
 		/// 此帐号是否已经在当前站点中绑定
@@ -89,6 +94,13 @@ class xwbAuth {
 			if( $bInfo['sina_uid'] == $uInfo['id'] && ($bInfo['token'] != $last_key['oauth_token'] || $bInfo['tsecret'] != $last_key['oauth_token_secret']) ){
                 XWB_plugin::updateBindUser($bInfo['uid'], $bInfo['sina_uid'], (string)$last_key['oauth_token'], (string)$last_key['oauth_token_secret'], $uInfo['screen_name']); //远程API
             }
+            
+            //更新expire值
+            $userProfile_obj =& XWB_plugin::N('xwbUserProfile');
+            $userProfile_obj->uid = $bInfo['uid'];
+            $userProfile_obj->set('oauth2_expiretime', $oauth2_expiretime);
+            unset($userProfile_obj);
+            
 		}
 		
 		//--------------------------------------------------------------------
@@ -114,6 +126,12 @@ class xwbAuth {
 				if(!$rst){echo "DB ERROR";exit;return false;}
 				$tipsType = 'bind';
 				dsetcookie($this->_getBindCookiesName(XWB_S_UID) , (string)$uInfo['id'], 604800);
+				
+	            //更新expire值
+    	        $userProfile_obj =& XWB_plugin::N('xwbUserProfile');
+         	   	$userProfile_obj->uid = XWB_S_UID;
+            	$userProfile_obj->set('oauth2_expiretime', $oauth2_expiretime);
+            	unset($userProfile_obj);
 				
 				//正向绑定统计上报
 				$sess->appendStat('bind', array( 'uid' => $uInfo['id'], 'type' => 1 ));
@@ -147,7 +165,8 @@ class xwbAuth {
 			dsetcookie('xwb_tips_type', $tipsType, 0);
 		}
 		//$sess->setInfo('xwb_tips_type', $tipsType);
-		$sess->setInfo('waiting_site_bind',	0);
+		$sess->delInfo('waiting_site_bind');
+		$sess->delInfo('xweibo_oauthlogin');
 		
 		//使用sina微博帐号登录成功（不管是否绑定）统计上报
 		$sess->appendStat('login', array( 'uid' => $uInfo['id'], 'is_bind' => $stat_is_bind_type ));
@@ -226,19 +245,17 @@ class xwbAuth {
 		$sess->clearToken();
 		
 		$wbApi = XWB_plugin::getWB();
-		$keys = $wbApi->getRequestToken();
 		
-		if( !isset($keys['oauth_token']) || !isset($keys['oauth_token_secret']) ){
-			$api_error_origin = isset($keys['error']) ? $keys['error'] : 'UNKNOWN ERROR. MAYBE SERVER CAN NOT CONNECT TO SINA API SERVER';
-			$api_error = ( isset($keys['error_CN']) && !empty($keys['error_CN']) && 'null' != $keys['error_CN'] ) ? $keys['error_CN'] : '';
-			
-			XWB_plugin::LOG("[WEIBO CLASS]\t[ERROR]\t#{$wbApi->req_error_count}\t{$api_error}\t{$wbApi->last_req_url}\tERROR ARRAY:\r\n".print_r($keys, 1));
-			XWB_plugin::showError("服务器获取Request Token失败；请稍候再试。<br />错误原因：{$api_error}[{$api_error_origin}]");
-		}
+		$param = array();
+		$param['state'] = array();
+		$param['state']['by'] = 'xweibo';
 		
-		//print_r($keys);
-		$aurl = $wbApi->getAuthorizeURL($keys['oauth_token'] ,false , XWB_plugin::getEntryURL('xwbAuth.authCallBack'));
-		$sess->setOAuthKey($keys, false);
+		$ref_token = xwb_token::make('xweibo_oauthlogin', false);
+		$sess = XWB_plugin::getUser();
+		$sess->setInfo('xweibo_oauthlogin',	$ref_token);
+		$param['state']['token'] = $ref_token;
+		
+		$aurl = $wbApi->getAuthorizeURL($param, TRUE, XWB_plugin::getEntryURL('xwbAuth.authCallBack'));
 		return rtrim($aurl, '&');
 	}
 	
@@ -251,5 +268,7 @@ class xwbAuth {
 		return 'sina_bind_'. $uid;
 	}
 	
+	
+	
+	
 }
-?>

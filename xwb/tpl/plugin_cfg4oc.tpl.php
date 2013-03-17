@@ -41,7 +41,7 @@
             $id('serchResultsUl').innerHTML = '<img src="<?php echo XWB_plugin::getPluginUrl('images/bgimg/xwb_loading.gif');?>" />';
             XWBcontrol.util.connect('<?php echo XWB_plugin::getEntryURL("xwbSiteInterface.ocSearch");?>&' + Math.random(), {
                 method : 'POST',
-                data : 'search=' + $id('searchStr').value + (page ? '&page=' + page : ''),
+                data : 'search=' + $id('searchStr').value + (page ? '&page=' + page : '') + '<?php echo '&'. XWB_TOKEN_NAME. '='. $tokenhash; ?>',
                 success : function(rst) {
                     if (rst.error_no) {
                         $id('serchResultsUl').innerHTML = rst.error;
@@ -76,7 +76,7 @@
             $id('headArea').innerHTML = '<img src="<?php echo XWB_plugin::getPluginUrl('images/bgimg/xwb_loading.gif');?>" />';
             XWBcontrol.util.connect('<?php echo XWB_plugin::getEntryURL("xwbSiteInterface.doPluginCfg4oc");?>&' + Math.random(), {
                 method : 'POST',
-                data : 'id=' + id + '&name=' + name,
+                data : 'id=' + id + '&name=' + name + '<?php echo '&'. XWB_TOKEN_NAME. '='. $tokenhash; ?>',
                 success : function(rst) {
                     if (rst.error_no) {
                         $id('headArea').innerHTML = rst.error;
@@ -85,7 +85,7 @@
                         var domain = rst.id;
                         data.push('<div class="user-pic">');
                         if(rst.local_image_url){
-                            data.push('<a href="http://weibo.com/' + domain + '" target="_blank">'
+                            data.push('<a href="http://weibo.com/u/' + domain + '" target="_blank">'
                                 + '<img alt="官方微博头像" src="' + rst.local_image_url + '?' + Math.random() + '" />'
                                 + '</a></div>'
                             );
@@ -94,7 +94,7 @@
                         }
                         data.push('<div class="info">'
                             + '<span class="name">' + rst.screen_name + '</span>'
-                            + '<div class="link"><a target="_blank" href="http://weibo.com/' + domain + '">http://weibo.com/' + domain + '</a></div>'
+                            + '<div class="link"><a target="_blank" href="http://weibo.com/u/' + domain + '">http://weibo.com/u/' + domain + '</a></div>'
                         );
                         data.push('</div>');
                         $id('headArea').innerHTML = data.join('');
@@ -185,7 +185,7 @@
                         ?>
                         <div class="user-pic">
                             <?php if(isset($owbUserRs['local_image_url'])):?>
-                            <a href="<?php echo 'http://weibo.com/' . $domain;?>" target="_blank">
+                            <a href="<?php echo 'http://weibo.com/u/' . $domain;?>" target="_blank">
                                 <img alt="官方微博头像" src="<?php echo $owbUserRs['local_image_url'] . '?' . mt_rand(1, 9999999999)/10000000000;?>" />
                             </a>
                             <?php else:?>
@@ -196,7 +196,7 @@
                             <span class="name"><?php echo $owbUserRs['screen_name'];?></span>
                             <!--a href="#">修改</a-->
                             <div class="link">
-                                <a href="<?php echo 'http://weibo.com/' . $domain;?>" target="_blank"><?php echo 'http://weibo.com/' . $domain;?></a>
+                                <a href="<?php echo 'http://weibo.com/u/' . $domain;?>" target="_blank"><?php echo 'http://weibo.com/u/' . $domain;?></a>
                             </div>
                         </div>
                         <?php else:?>
@@ -215,6 +215,7 @@
             <div class="wrap-inner">
             	<h3 class="main-title">其它相关设置</h3>
             	<form action="<?php echo XWB_plugin::getEntryURL("xwbSiteInterface.doPluginCfg4ocSet");?>" id="siteRegFrom"  method="post" target="xwbHideFrame">
+            	<input type="hidden" name="<?php echo XWB_TOKEN_NAME; ?>" value="<?php echo $tokenhash; ?>" />
             		<ul>
                     	<li>
                     		<label for="part90">

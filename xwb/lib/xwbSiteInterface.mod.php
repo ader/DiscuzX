@@ -5,7 +5,7 @@
  * @author xionghui<xionghui1@staff.sina.com.cn>
  * @since 2010-06-08
  * @copyright Xweibo (C)1996-2099 SINA Inc.
- * @version $Id: xwbSiteInterface.mod.php 836 2011-06-15 01:48:00Z yaoying $
+ * @version $Id: xwbSiteInterface.mod.php 1022 2012-09-26 09:33:16Z yaoying $
  *
  */
 class xwbSiteInterface {
@@ -136,6 +136,13 @@ class xwbSiteInterface {
 			XWB_plugin::showError('要关注的用户参数错误！');
 		}
 		
+		if(!isset($_GET[XWB_TOKEN_NAME]) || $_GET[XWB_TOKEN_NAME] != FORMHASH){
+			XWB_plugin::showError('请求错误，请重试！');
+		}
+		if(xwb_token::checkReferer() < 0){
+			XWB_plugin::showError('请求来源失效，请重试！');
+		}
+		
 		$mySinaUid	= XWB_plugin::getBindInfo('sina_uid','');
 		if (empty($mySinaUid)){
 			XWB_plugin::redirect('xwbSiteInterface.bind', 2);
@@ -156,6 +163,8 @@ class xwbSiteInterface {
 		if (!defined('XWB_S_IS_ADMIN') || !XWB_S_IS_ADMIN){
 			XWB_plugin::deny('');
 		}
+		
+		$tokenhash = xwb_token::make('pluginCfg', true);
 		include XWB_P_ROOT.'/tpl/plugin_cfg_app_set.tpl.php';
 	}
 	
@@ -166,6 +175,8 @@ class xwbSiteInterface {
 	function doPluginCfg(){
 		if (!defined('XWB_S_IS_ADMIN') || !XWB_S_IS_ADMIN || !XWB_plugin::isRequestBy('POST') ){
 			XWB_plugin::deny('');
+		}elseif(!xwb_token::checkInput('p','pluginCfg', true)){
+			XWB_plugin::showError('令牌验证失败，请返回重试');
 		}
 		
 		$set = (array)XWB_plugin::V('p:pluginCfg');
@@ -191,6 +202,7 @@ class xwbSiteInterface {
 							'bind_btn_usernav' => array(0,1),
                             'is_tgc_display' => array(0,1),
 							'space_card_weiboinfo' => array(0,1),
+							'oauth2_expire_notice' => array(0,999999999),
 							);
 		
 		$newset = $this->_filterInput($set, $inputCheck);
@@ -212,6 +224,7 @@ class xwbSiteInterface {
 		if (!defined('XWB_S_IS_ADMIN') || !XWB_S_IS_ADMIN){
 			XWB_plugin::deny('');
 		}
+		$tokenhash = xwb_token::make('pluginCfg4Sync', true);
 		include XWB_P_ROOT.'/tpl/plugin_cfg_sync_set.tpl.php';
 	}
 	
@@ -222,6 +235,8 @@ class xwbSiteInterface {
 	function doPluginCfg4Sync(){
 		if (!defined('XWB_S_IS_ADMIN') || !XWB_S_IS_ADMIN || !XWB_plugin::isRequestBy('POST')){
 			XWB_plugin::deny('');
+		}elseif(!xwb_token::checkInput('p','pluginCfg4Sync', true)){
+			XWB_plugin::showError('令牌验证失败，请返回重试');
 		}
 		
 		$set = (array)XWB_plugin::V('p:pluginCfg');
@@ -256,7 +271,7 @@ class xwbSiteInterface {
         if (!defined('XWB_S_IS_ADMIN') || !XWB_S_IS_ADMIN){
 			XWB_plugin::deny('');
 		}
-		
+		$tokenhash = xwb_token::make('pluginCfg4oc', true);
         $owbUserRs = $this->_getCacheOfficialWeiboUser();
 
 		include XWB_P_ROOT.'/tpl/plugin_cfg4oc.tpl.php';
@@ -266,6 +281,8 @@ class xwbSiteInterface {
     {
     	if (!defined('XWB_S_IS_ADMIN') || !XWB_S_IS_ADMIN || !XWB_plugin::isRequestBy('POST')){
 			XWB_plugin::deny('');
+		}elseif(!xwb_token::checkInput('p','pluginCfg4oc', true)){
+			exit(json_encode(array('error_no' => 1, 'error' => '令牌验证失败，请重试'))); //参数为空
 		}
     	
         // 获取参数
@@ -337,7 +354,14 @@ class xwbSiteInterface {
         
         if (!$q || !defined('XWB_S_IS_ADMIN') || !XWB_S_IS_ADMIN || !XWB_plugin::isRequestBy('POST')){
         	exit(json_encode(array('error_no' => 1, 'error' => '请输入搜索关键字.'))); //参数为空
-        }
+        }elseif(!xwb_token::checkInput('p','pluginCfg4oc', true)){
+			exit(json_encode(array('error_no' => 1, 'error' => '令牌验证失败，请重试'))); //参数为空
+		}
+		
+    	$mySinaUid	= XWB_plugin::getBindInfo('sina_uid','');
+		if (empty($mySinaUid)){
+			exit(json_encode(array('error_no' => 1, 'error' => '请管理员绑定一个新浪微博帐号，再重试'))); //参数为空
+		}		
 
         //组织参数
         $params = array(
@@ -356,7 +380,7 @@ class xwbSiteInterface {
         $result = $weiboClient->searchUser($params); //搜索用户
 
         // 发生通讯错误
-        if ( ! is_array($result) || empty($result) || isset($result['error'])) exit(json_encode(array('error_no' => 1, 'error' => "无法从接口中获取用户信息.")));
+        if ( ! is_array($result) || empty($result) || isset($result['error'])) exit(json_encode(array('error_no' => 1, 'error' => "无法从接口中获取用户信息，请输入完整昵称试试")));
         
         echo json_encode($result); //输出json数据
     }
@@ -365,6 +389,8 @@ class xwbSiteInterface {
     function doPluginCfg4ocSet(){
         if (!defined('XWB_S_IS_ADMIN') || !XWB_S_IS_ADMIN || !XWB_plugin::isRequestBy('POST')){
 			XWB_plugin::deny('');
+        }elseif(!xwb_token::checkInput('p','pluginCfg4oc', true)){
+			XWB_plugin::showError('令牌验证失败，请返回重试');
 		}
 		
 		$set = (array)XWB_plugin::V('p:pluginCfg');
@@ -424,7 +450,8 @@ class xwbSiteInterface {
 		
 		if (empty($uid)){
 			$wbApi	= XWB_plugin::getWB();
-			$uInfo	= $wbApi->verifyCredentials();
+			$api_uid = $wbApi->get_uid();
+			$uInfo	= $wbApi->verifyCredentials($api_uid['uid']);
 			
 			//验证微博帐号是否已经在当前站点中绑定，防止用户通过多个浏览器恶意注册用户
 			$bInfo = XWB_plugin::getBindUser($uInfo['id'], 'sina_uid'); //远程API
@@ -449,6 +476,16 @@ class xwbSiteInterface {
 			$rst = XWB_plugin::addBindUser($uid, $uInfo['id'], (string)$last_key['oauth_token'], (string)$last_key['oauth_token_secret'], $uInfo['screen_name']); //远程API
 			require_once XWB_P_ROOT. '/lib/xwbSite.inc.php';
 			xwb_setSiteUserLogin($uid);
+			
+            //更新expire值
+            $userProfile_obj =& XWB_plugin::N('xwbUserProfile');
+            $userProfile_obj->uid = $uid;
+            $oauth2_expiretime = $sess->getInfo('oauth2_expiretime');
+            if($oauth2_expiretime < TIMESTAMP){
+            	$oauth2_expiretime = TIMESTAMP + 604800;
+            }
+            $userProfile_obj->set('oauth2_expiretime', $oauth2_expiretime);
+            unset($userProfile_obj);			
 			
 			if( XWB_plugin::pCfg('is_sync_face') ){
 				//同步新浪头像（放到脚本结束时进行）
@@ -495,6 +532,14 @@ class xwbSiteInterface {
 		}
 		
 		$this->_chkIsWaitingForReg();
+		
+		$ipCountInstance =& XWB_Plugin::O('xwbIpCount');
+		$ipInputCount = $ipCountInstance->get('regInput');
+		if($ipInputCount >= 5){
+			$this->_oScript('xwbSetTips',array('-901', '密码错误输入次数超出限制，请15分钟后重试', 1));
+			exit();
+		}
+		
 		$usernameS	= trim( (string)(XWB_plugin::V('p:siteBindName')) );
 		$password	= trim( (string)(XWB_plugin::V('p:bindPwd')) );
 		$questionid	= (int)(XWB_plugin::V('p:questionid'));
@@ -518,11 +563,15 @@ class xwbSiteInterface {
 			$verify = XWB_plugin::O('siteUserVerifier');
 			$verifyresult = $verify->verify ( $username, $password, $questionid, $questionanswer );
 			$uid = $verifyresult[0];
+			if($uid < 1){
+				$ipCountInstance->set('regInput', $ipInputCount + 1);
+			}			
 		}
 		
 		if( $uid > 0 ){
 			$wbApi	= XWB_plugin::getWB();
-			$uInfo	= $wbApi->verifyCredentials();
+			$api_uid = $wbApi->get_uid();
+			$uInfo	= $wbApi->verifyCredentials($api_uid['uid']);
 			
 			$db	 = XWB_plugin::getDB();
 			//第3关：验证微博帐号是否已经在当前站点中绑定，防止用户通过多个浏览器恶意注册用户
@@ -538,7 +587,16 @@ class xwbSiteInterface {
 			
 				require_once XWB_P_ROOT. '/lib/xwbSite.inc.php';
 				xwb_setSiteUserLogin($uid);
-				
+			
+        	    //更新expire值
+          	 	$userProfile_obj =& XWB_plugin::N('xwbUserProfile');
+           		$userProfile_obj->uid = $uid;
+            	$oauth2_expiretime = $sess->getInfo('oauth2_expiretime');
+            	if($oauth2_expiretime < TIMESTAMP){
+            		$oauth2_expiretime = TIMESTAMP + 604800;
+            	}
+            	$userProfile_obj->set('oauth2_expiretime', $oauth2_expiretime);
+            	unset($userProfile_obj);
 				
 				dsetcookie($this->_getBindCookiesName($uid), (string)$uInfo['id'], 604800);
 				dsetcookie('xwb_tips_type','',0);
@@ -702,21 +760,30 @@ class xwbSiteInterface {
 		// 已登录论坛并已绑定新浪微博
         if ( XWB_S_UID > 0 && $isBind )
         {
+            //获取用户绑定信息        	
+            $userProfileHandler = XWB_plugin::O('xwbUserProfile'); //定义用户资料管理器
+			$userPorfile = $userProfileHandler->get();
+			
             $weiboClient = XWB_plugin::getWB(); //定义微博通讯客户端
             $weiboClient->is_exit_error = FALSE; //忽略通讯错误
             $owbUserRs = $huwbUserRs = array(); //定义官方微博数据集和活跃用户数据集
-
+            
             // 处理新浪用户数据
             $sinaId = $xwbUserHandler->getInfo('sina_uid'); //获取用户绑定的新浪用户ID
             $sinaUserInfo = $weiboClient->getUserShow($sinaId); //根据新浪用户ID获取新浪用户信息
-            if( !$sinaUserInfo || isset($sinaUserInfo['error_code']) || isset($sinaUserInfo['error']) ) $this->_showBindError('api'); //API发生通讯错误
+            //API发生通讯错误
+            if( !$sinaUserInfo || isset($sinaUserInfo['error_code']) || isset($sinaUserInfo['error']) ){
+            	$this->_showBindError('api', array('userProfile'=>$userPorfile, 'api_name' =>'getUserShow', 'api_error'=>$sinaUserInfo, 'sina_uid'=>$sinaId,));
+            }
+            
             $friendIds = ($isBind && $sinaId) ? $weiboClient->getFriendIds($sinaId) : array('ids' => array()); //获取当前会员已关注的用户
-            if( !$friendIds || isset($friendIds['error_code']) || isset($friendIds['error']) ) $this->_showBindError('api'); //API发生通讯错误
+            if( !$friendIds || isset($friendIds['error_code']) || isset($friendIds['error']) ){
+            	$this->_showBindError('api', array('userProfile'=>$userPorfile, 'api_name' =>'getFriendIds', 'api_error'=>$friendIds, 'sina_uid'=>$sinaId,));
+            }
 
             // 处理设置数据
             $screenName = $sinaUserInfo['screen_name'];
             $domain = $sinaUserInfo['id'];
-            $userProfileHandler = XWB_plugin::O('xwbUserProfile'); //定义用户资料管理器
             $userSetting = $userProfileHandler->get('bind_setting', 1); //获取当前论坛登录用户的用户设置资料
 
             
@@ -725,11 +792,20 @@ class xwbSiteInterface {
             
             // 处理活跃用户数据
             $huwbUserRs = $this->_getHuwbUsers(2, $friendIds['ids']);
-
-            //获取用户绑定信息
-			$profile = XWB_plugin::O('xwbUserProfile');
-			$userPorfile = $profile->get();
+            
 			dsetcookie($this->_getBindCookiesName(XWB_S_UID), $sinaUserInfo['id'], 604800);
+			$sync_tokenhash = xwb_token::make('sync', true);
+			$unbind_tokenhash = xwb_token::make('unbind', true);
+			
+			//
+			$oauth_expire_time = XWB_plugin::pCfg('oauth2_expire_notice');
+            $myExpireTime = isset($userPorfile['oauth2_expiretime']) ? $userPorfile['oauth2_expiretime'] : 0;
+    		if($oauth_expire_time > 0 && $myExpireTime - TIMESTAMP < $oauth_expire_time * 60 * 60){
+    			$expire_notice = true;
+    		}else{
+    			$expire_notice = false;
+    		}
+			
 			include XWB_P_ROOT.'/tpl/xwb_bind.tpl.php';
         }
         
@@ -751,6 +827,8 @@ class xwbSiteInterface {
 	function unbind() {
 		if( XWB_S_UID < 1 || !XWB_plugin::pCfg('is_account_binding') ){
 			XWB_plugin::showError('网站管理员关闭了插件功能“新浪微博绑定”。请稍后再试。');
+		}elseif(!xwb_token::checkInput('p','unbind', true)){
+			XWB_plugin::showError('令牌验证失败，请返回重试');
 		}
 		
         XWB_plugin::delBindUser(XWB_S_UID); //远程API
@@ -769,6 +847,8 @@ class xwbSiteInterface {
 			XWB_plugin::showError('你尚未登录。');
 		}elseif( !XWB_plugin::pCfg('is_account_binding')  || !XWB_plugin::isRequestBy('POST') ){
 			XWB_plugin::showError('网站管理员关闭了插件功能“新浪微博绑定”。请稍后再试。');
+		}elseif(!xwb_token::checkInput('p','sync', true)){
+			XWB_plugin::showError('令牌验证失败，请返回重试');
 		}
 		
 		$set = (array)XWB_plugin::V('p:set');
@@ -878,10 +958,11 @@ class xwbSiteInterface {
         if (isset($ret['error_code']) && isset($ret['error']))
         {
             $error_code_se = substr($ret['error'], 0, 5);
-            if ('400' == $ret['error_code'] && '40025' == $error_code_se)
+            if ('20017' == $ret['error_code'] || '20017' == $error_code_se){
                 $ret['error'] = '错误:不能发布相同的微博!';
-            else
-                $ret['error'] = '错误:系统错误!';
+            }else{
+                $ret['error'] = '错误:系统错误!('. $ret['error']. ')';
+            }
             $this->_showTip($ret['error'], $rst);
         }
 
@@ -908,7 +989,7 @@ class xwbSiteInterface {
         $wbApi->setTempToken($keys['oauth_token'], $keys['oauth_token_secret']);
         $wbApi->is_exit_error = false;
         $rst = $wbApi->getUserShow($sina_id);
-
+        
         if ( ! is_array($rst) || isset($rst['error']) || empty($rst['id']))
             return array('error_no' => '10003', 'error' => "错误:无法从接口中获取用户信息.");
 
@@ -966,9 +1047,10 @@ class xwbSiteInterface {
      * 显示绑定时的错误信息
      * @param string $errorType 错误类型
      */
-    function _showBindError($errorType = 'api')
+    function _showBindError($errorType = 'api', $extra_data = array())
     {
         $isBind = XWB_plugin::isUserBinded(); //获取绑定关系
+        $unbind_tokenhash = xwb_token::make('unbind', true);
         include XWB_P_ROOT.'/tpl/xwb_bind_error.tpl.php';
         exit;
     }
@@ -1013,28 +1095,39 @@ class xwbSiteInterface {
     		'dm' => 0,
     		'mentions' => 0,
     		'comments' => 0,
-    		'allsum' => 0
+    		'allsum' => 0,
+    		'oauth2expire' => 0,
     	);
     	
         if(!$this->_checkNextUnreadTime()){
     		$result['errno'] = -1;
-    	}elseif(!XWB_plugin::pCfg('switch_to_xweibo')){
-    		$this->_setNextUnreadCheckTime();
-    		$result['errno'] = -3;
     	}elseif(!XWB_S_UID || !XWB_Plugin::isUserBinded()){
     		$this->_setNextUnreadCheckTime();
     		$result['errno'] = -2;
     	}else{
-    		$wb = XWB_plugin::getWB();
-    		$wb->is_exit_error = false;
-    		$respond = $wb->getUnread();
-    		if(!is_array($respond) || isset($respond['error'])){
-    			$result['errno'] = isset($respond['error']) ? (int)$respond['error'] : -3;
-    		}else{
-    			$result = array_merge($result, $respond);
-    			$this->_setUnreadCookie($result);
+    		if(XWB_plugin::pCfg('switch_to_xweibo')){
+    		    $wb = XWB_plugin::getWB();
+    			$wb->is_exit_error = false;
+    			$respond = $wb->getUnread();
+    			if(!is_array($respond) || isset($respond['error'])){
+    				//$result['errno'] = isset($respond['error']) ? (int)$respond['error'] : -3;
+    			}else{
+    				$result = array_merge($result, $respond);
+    			}
     		}
     		
+    		$oauth_expire_time = XWB_plugin::pCfg('oauth2_expire_notice');
+    		$userProfile_obj =& XWB_plugin::N('xwbUserProfile');
+            $myExpireTime = $userProfile_obj->get('oauth2_expiretime');
+            if(!is_numeric($myExpireTime)){
+            	$myExpireTime = 0;
+            }
+    		if($oauth_expire_time > 0 && $myExpireTime - TIMESTAMP < $oauth_expire_time * 60 * 60){
+    			$result['oauth2expire'] = 1;
+    			$result['allsum'] += 1;
+    		}
+    		
+    		$this->_setUnreadCookie($result);
     		$this->_setNextUnreadCheckTime();
     	}
     	
@@ -1080,9 +1173,9 @@ class xwbSiteInterface {
     function _setUnreadCookie($result){
     	$_cookieResult = array(
     		'followers' => 0,
-    		'dm' => 0,
     		'mentions' => 0,
     		'comments' => 0,
+    		'oauth2expire' => 0,
     	);
     	
     	$expire = 0;    //cookie-session

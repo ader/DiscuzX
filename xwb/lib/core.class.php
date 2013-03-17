@@ -4,7 +4,7 @@
  * @author xionghui<xionghui1@staff.sina.com.cn>
  * @author yaoying<yaoying@staff.sina.com.cn>
  * @copyright SINA INC.
- * @version $Id: core.class.php 836 2011-06-15 01:48:00Z yaoying $
+ * @version $Id: core.class.php 1013 2012-09-25 03:55:45Z yaoying $
  */
 class XWB_plugin {
 	
@@ -35,7 +35,7 @@ class XWB_plugin {
 			$ip = "unknown";
 		}
 		
-		return ( $ip == 'unknown' || ip2long ( $ip ) === false || ip2long ( $ip ) == -1 ) ? '0.0.0.0' : $ip;
+		return ( $ip == 'unknown' || !preg_match('/^((25[0-5]|2[0-4]\d|(1\d|[1-9])?\d)\.){3}(25[0-5]|2[0-4]\d|(1\d|[1-9])?\d)$/', $ip) ) ? '0.0.0.0' : $ip;
 	}
 	
 	/**
@@ -351,7 +351,7 @@ class XWB_plugin {
 	 * @param bool $deny 是否发送403 http错误？是则表示调用本类静态方法deny
 	 * @param array $extra 其他详细信息，用于debug显示（现在暂时无用）
 	 */
-	function showError( $info = '', $deny = false, $extra = array() ){
+	function showError( $info = '', $deny = false, $extra_data = array() ){
 		if( true == $deny ){
 			XWB_plugin::deny($info);
 		}else{
@@ -995,10 +995,154 @@ class XWB_plugin {
 		if(XWB_plugin::pCfg('switch_to_xweibo') && !empty($xweibourl)){
 			$xweibourl_ta = $xweibourl. '/index.php?m=ta&id='. $sina_uid;
 		}else{
-			$xweibourl_ta = 'http://weibo.com/'. $sina_uid;
+			$xweibourl_ta = 'http://weibo.com/u/'. $sina_uid;
 		}
 		return $xweibourl_ta;
 	}
     
 }
 
+/**
+ * 工具库之json兼容相关：解码bigint
+ * 目前本代码的正确使用依赖需要配合正则，因此，请在使用前仔细进行调试！
+ * @author yaoying
+ * @since 2011-09-01
+ */
+class xwb_util_json{
+    
+    /**
+     * 本静态方法在64位时，将和原生调用json_decode一致；
+     * 在32位操作系统时，将强制使用或者模拟php 5.4的JSON_BIGINT_AS_STRING，
+     * 以解决在32位操作系统时的bigint转换错误导致精度丢失问题。
+     * 本静态方法仅采用前两位参数。
+     * @static
+     * @see http://www.php.net/manual/en/function.json-decode.php
+     * @param string $json
+     * @param bool[optional] $assoc
+     */
+    function decode($json, $assoc = false){
+        switch(xwb_util_json::get_decode_type()){
+            case 0:
+                return json_decode($json, $assoc);
+                break;
+            case 1:
+                return json_decode($json, $assoc, 512, JSON_BIGINT_AS_STRING);
+                break;
+            default:
+                $json = preg_replace('#(?<=[,\{\[])\s*("\w+"):(\d{6,})(?=\s*[,\]\}])#si', '${1}:"${2}"', $json);
+                return json_decode($json, $assoc);
+                break;
+        }
+    }
+    
+    /**
+     * 获取当前正采取哪种json_decode方式
+     * @static
+     * @return int 可能的结果有：
+     * <pre>
+     * 0：操作系统64位，不作特殊处理；
+     * 1：php版本5.4及以上，采取JSON_BIGINT_AS_STRING处理
+     * 2：需要进行preg_replace处理
+     * </pre>
+     */
+    function get_decode_type(){
+    	/**
+     	* json解码类型
+     	* @var int
+     	*/
+    	static $_dtype = -1;
+        if($_dtype >= 0){
+            return $_dtype;
+        }
+        if(defined('PHP_INT_SIZE') && PHP_INT_SIZE > 4){
+            $_dtype = 0;
+        }elseif(defined('JSON_BIGINT_AS_STRING')){
+            $_dtype = 1;
+        }else{
+            $_dtype = 2;
+        }
+        return $_dtype;
+    }
+    
+}
+
+
+/**
+ * 令牌生成与校验
+ * @author yaoying
+ * @since 2011-07-20
+ *
+ */
+class xwb_token{
+	
+	/**
+	 * 生成令牌token
+	 * @param string $hashadd
+	 * @param bool $useBindData 默认为false
+	 * @return string
+	 */
+	function make($hashadd='', $useBindData = false){
+		global $_G;
+		$skey = defined('XWB_APP_SECRET_KEY') ? XWB_APP_SECRET_KEY : rand(1,100000000);
+		$sina_uid = 0;
+		if($useBindData){
+			$sina_uid = XWB_plugin::getBindInfo('sina_uid', 0);
+		}
+		return substr(md5("{$_G['adminid']}#{$hashadd}#{$_G['uid']}#{$skey}#{$sina_uid}#{$_SERVER['HTTP_USER_AGENT']}"), 6, 10);
+	}
+	
+	/**
+	 * 二次tokenhash DX提供的 FORMHASH，防止被利用反向劫持dz/dx（不考虑正向）
+	 * @return string
+	 */
+	function makeSecFormhash(){
+		return substr(md5(FORMHASH), 6, 10);
+	}
+	
+	/**
+	 * 验算令牌token是否正确
+	 * @param string $type 类型，可选值：g/p/c/r
+	 * @param string $hashadd 
+	 * @param bool $useBindData 默认为false
+	 * @param bool $checkreferer 是否顺带check一下referer？默认为是
+	 * @return bool
+	 */
+	function checkInput($type='p', $hashadd='', $useBindData = false, $checkreferer = true){
+		if($checkreferer && xwb_token::checkReferer() < 0){
+			return false;
+		}
+		if(XWB_plugin::V($type. ':' . XWB_TOKEN_NAME) != xwb_token::make($hashadd, $useBindData)){
+			return false;
+		}else{
+			return true;
+		}
+	}
+	
+	/**
+	 * 验算二次tokenhash是否正确
+	 * @param string $type 类型，可选值：g/p/c/r
+	 * @return bool
+	 */
+	function checkSecFormhash($type='p'){
+		if(XWB_plugin::V($type. ':'. XWB_TOKEN_NAME) != xwb_token::makeSecFormhash()){
+			return false;
+		}else{
+			return true;
+		}
+	}
+	
+	/**
+	 * 检查请求来源是否正确
+	 * 代码来自DX
+	 * @return int 成功返回0，否则返回负数
+	 */
+	function checkReferer(){
+		if(empty($_SERVER['HTTP_REFERER'])){
+			return -1;
+		}elseif(empty($_SERVER['HTTP_HOST'])){
+			return -2;
+		}
+		return preg_replace("/https?:\/\/([^\:\/]+).*/i", "\\1", $_SERVER['HTTP_REFERER']) == preg_replace("/([^\:]+).*/", "\\1", $_SERVER['HTTP_HOST']) ? 0 : -3;
+	}
+	
+}

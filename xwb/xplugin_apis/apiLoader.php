@@ -28,7 +28,7 @@ class apiLoader extends apiBase
         $this->_validate($A, $P, $T, $F); //检测验证
 
         ///处理参数集
-        $PJDecode = (($tmp = json_decode(preg_replace('#(?<=[,\{\[])\s*("\w+"):(\d{6,})(?=\s*[,\]\}])#si', '${1}:"${2}"', $P), true)) && is_array($tmp)) ? $tmp : array();
+        $PJDecode = (($tmp = xwb_util_json::decode($P, TRUE)) && is_array($tmp)) ? $tmp : array();
         if('null' != strtolower($P) && !$PJDecode) {
             $this->_ERHelper('4030001', TRUE, 'load');
         }

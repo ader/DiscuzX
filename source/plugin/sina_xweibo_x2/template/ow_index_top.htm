@@ -4,7 +4,7 @@
 <script type="text/javascript">
 try{
 	<!--{if isset($GLOBALS['_G']['uid']) && $GLOBALS['_G']['uid'] > 0}-->
-	xwbOw.show('{$owbUserRs['id']}', '{$owbUserRs['screen_name_local_encode']}', '{$profile_url}', 1);
+	xwbOw.show('{$owbUserRs['id']}', '{$owbUserRs['screen_name_local_encode']}', '{$profile_url}', 1, '{FORMHASH}');
 	<!--{else}-->
 	xwbOw.show('{$owbUserRs['id']}', '{$owbUserRs['screen_name_local_encode']}', '{$profile_url}', 0);
 	<!--{/if}-->

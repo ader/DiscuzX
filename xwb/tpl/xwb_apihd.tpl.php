@@ -1,4 +1,4 @@
-<style type="text/css">
+<?php if (!defined('IS_IN_XWB_PLUGIN')) {die('access deny!');}?><style type="text/css">
 * {margin: 0;padding: 0;word-wrap: break-word;}
 #apihd_hd {border-bottom: 0 solid #C2D5E3;margin-bottom: 10px;}
 #apihd_hd .apihd_wp {padding: 10px 0 0;margin: 0 auto;width: 960px;}

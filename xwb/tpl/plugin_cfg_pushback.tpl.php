@@ -42,7 +42,7 @@ function xwbSetPushbackAuthKey()
     $id('loading').innerHTML = '<img src="<?php echo XWB_plugin::getPluginUrl('images/bgimg/xwb_loading.gif');?>" />';
     XWBcontrol.util.connect('<?php echo XWB_plugin::getEntryURL("pushbackInterface.doCfg4setAuthKey");?>', {
         method : 'POST',
-        data : '',
+        data : '<?php echo '&'. XWB_TOKEN_NAME. '='. $tokenhash; ?>',
         success : function(rst) {
             $id('loading').innerHTML = '';
             if (rst[0] != 1) {
@@ -70,6 +70,7 @@ function xwbSetPushbackAuthKey()
     	<div class="wrap-inner">
         	<h3 class="main-title">评论回推设置</h3>
             <form action="<?php echo XWB_plugin::getEntryURL("pushbackInterface.doCfg4pushback");?>" id="siteRegFrom"  method="post" target="xwbHideFrame">
+            <input type="hidden" name="<?php echo XWB_TOKEN_NAME; ?>" value="<?php echo $tokenhash; ?>" />
             	<ul>
                 	<li>
                 		<a id="not-set-authkey-link" class="binding-btn back-on <?php if( 1 == $isOpen ){ ?>hidden<?php } ?>" href="#" onclick="xwbSetPushbackAuthKey();return false;"><span>开启评论回流</span></a>

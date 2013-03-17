@@ -10,7 +10,7 @@
  * @author heli
  * @copyright Copyright &copy; 2008-2010 Twomice Studio
  * @link http://www.hightman.cn/bbs/showthread.php?tid=838
- * @version $Id: fsockopenHttp.class.php 708 2011-05-09 01:30:22Z yaoying $
+ * @version $Id: fsockopenHttp.class.php 1011 2012-09-21 10:34:29Z yaoying $
  */
 
 /*
@@ -164,6 +164,16 @@ class fsockopenHttp
         return $this->status;
 	}
 
+	/**
+	 * 获取调用的url
+	 *
+	 * @return string
+	 */
+	function getUrl()
+	{
+		return $this->_serverUrl;
+	}	
+	
 	function request($method = null, $https = false)
 	{
 		$method = empty($method) ? 'GET' : strtoupper($method);
@@ -453,10 +463,11 @@ class fsockopenHttp
         if ($ck_str != '') $buf .= 'Cookie:' . substr($ck_str, 1) . "\r\n";
         foreach ($this->headers as $k => $v)
         {
-            if ($k != 'cookie')
+        	if($k == 'api-remoteip'){
+        		$buf .= "API-RemoteIP: " . $v . "\r\n";
+        	}elseif ($k != 'cookie'){
                 $buf .= ucfirst($k) . ": " . $v . "\r\n";
-            else
-            {
+    		}else{
                 $vv = '';
                 foreach ($v as $ck => $cv) $vv .= '; ' . rawurlencode($ck) . '=' . rawurlencode($cv);
                 if ($vv != '') $buf .= 'Cookie:' . substr($vv, 1) . "\r\n";
