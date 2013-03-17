@@ -12,12 +12,12 @@ if(!defined('IN_DISCUZ')) {
 }
 
 function xml2array(&$xml, $isnormal = FALSE) {
-	$encoding_regex = '/^<\?xml[^>]*encoding=(?:\'|")([^\'"]+)(?:\'|")[^>]*\?>/i';
-	if(preg_match($encoding_regex, $xml, $encoding_matches)){
-		$xml_parser = new XMLparse($isnormal, $encoding_matches[1]);
-	} else {
+	$regex = '/<\?xml[^>]*encoding=(?:\'|")([^\'"]+)(?:\'|")[^>]*\?>/i';
+//	if(preg_match($regex, $xml, $matches)){
+//		$xml_parser = new XMLparse($isnormal, $matches[1]);
+//	} else {
 		$xml_parser = new XMLparse($isnormal);
-	}
+//	}
 	$data = $xml_parser->parse($xml);
 	$xml_parser->destruct();
 	return $data;
@@ -54,7 +54,7 @@ class XMLparse {
 
 	function XMLparse($isnormal, $encoding = 'ISO-8859-1') {
 		$this->isnormal = $isnormal;
-		$this->parser = xml_parser_create($encoding);//ISO-8859-1
+		$this->parser = xml_parser_create(/*$encoding*/);//原Discuz默认ISO-8859-1，自PHP5.02以上可以省略此参数，会自动侦测
 		xml_parser_set_option($this->parser, XML_OPTION_CASE_FOLDING, false);
 		xml_set_object($this->parser, $this);
 		xml_set_element_handler($this->parser, 'open','close');
