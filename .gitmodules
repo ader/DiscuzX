@@ -13,3 +13,9 @@
 [submodule "source/plugin/dps_exadmincp"]
 	path = source/plugin/dps_exadmincp
 	url = git@github.com:Magillusionalgame/dps_exadmincp.git
+[submodule "template/yeei_dream"]
+	path = template/yeei_dream
+	url = git@github.com:Magillusionalgame/yeei_dream.git
+[submodule "template/dps_yeei_dream_ext"]
+	path = template/dps_yeei_dream_ext
+	url = git@github.com:Magillusionalgame/dps_yeei_dream_ext.git
