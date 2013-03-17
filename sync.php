@@ -39,7 +39,7 @@ if (@$_REQUEST['operation'] == 'push') {
 	$remove  = 0;
 	$unzippath = './';
 	if(file_exists($path.$name) && is_file($path.$name)){
-		include('PclZip.class.php');
+		include('pclzip.class.php');
 		$Zip = new PclZip($path.$name);
 		$result = $Zip->extract($path.(('./' == $unzippath || '。/' == @$_POST['unzippath'])?'':$unzippath), $remove);
 		if($result){
