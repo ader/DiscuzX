@@ -4,3 +4,9 @@
 [submodule "template/default"]
 	path = template/default
 	url = git@github.com:Magillusionalgame/DiscuzX_default_Template.git
+[submodule "uc_server"]
+	path = uc_server
+	url = git@github.com:Magillusionalgame/dps_uc_server.git
+[submodule "uc_client"]
+	path = uc_client
+	url = git@github.com:Magillusionalgame/dps_uc_client.git
