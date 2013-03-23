@@ -1,6 +1,6 @@
 [submodule "kohana"]
 	path = kohana
-	url = git://github.com/kohana/kohana.git
+	url = git@github.com:DPSKOHANA/kohana.git
 [submodule "template/default"]
 	path = template/default
 	url = git@github.com:DPSDiscuzX/DiscuzX_default_Template.git
