@@ -120,7 +120,7 @@ echo <<<EOT
 </td>
 </tr>
 <tr>
-<td valign="top" width="160" class="menutd">
+<td valign="top" width="220" class="menutd">
 <div id="leftmenu" class="menu">
 
 EOT;
