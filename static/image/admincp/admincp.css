@@ -156,7 +156,7 @@ a.faq { background: url(faq.gif) no-repeat 0 2px; padding:1px; margin-left:10px;
 .logintips{ line-height:160%; margin-left:25px; }
 	.logintips a{ margin:0 5px; text-decoration:underline; }
 .footer{}
-	.footer .copyright{ position:static; margin-top:120px; border:none; text-align:center; font-size:12px; }
+	.footer .copyright{ position:static; margin-top:120px; border:none; text-align:center; font-size:12px; width: auto; }
 	.footer p{ display:inline; }
 
 .container{ padding:9px 20px 20px; text-align:left; }
