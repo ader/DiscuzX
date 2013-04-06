@@ -1,5 +1,5 @@
-[submodule "kohana"]
-	path = kohana
+[submodule "source/kohana"]
+	path = source/kohana
 	url = git@github.com:DPSKOHANA/kohana.git
 [submodule "template/default"]
 	path = template/default
