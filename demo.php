@@ -1,5 +1,5 @@
 <?php
-require_once 'kohana/include.php';
+require_once 'source/kohana/include.php';
 
 $content = 'Hello World';
 $content = HTML::anchor('http://kohanaframework.org/', $content);
