@@ -19,6 +19,3 @@
 [submodule "template/dps_yeei_dream_ext"]
 	path = template/dps_yeei_dream_ext
 	url = git@github.com:DPSDiscuzX/dps_yeei_dream_ext.git
-[submodule "static/TinyMCE"]
-	path = static/TinyMCE
-	url = git://github.com/tinymce/tinymce.git
