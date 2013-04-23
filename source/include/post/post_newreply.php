@@ -4,7 +4,7 @@
  *      [Discuz!] (C)2001-2099 Comsenz Inc.
  *      This is NOT a freeware, use is subject to license terms
  *
- *      $Id: post_newreply.php 31949 2012-10-25 09:01:04Z liulanbo $
+ *      $Id: post_newreply.php 32968 2013-03-29 02:20:19Z monkey $
  */
 
 if(!defined('IN_DISCUZ')) {
@@ -14,6 +14,7 @@ if(!defined('IN_DISCUZ')) {
 require_once libfile('function/forumlist');
 
 $isfirstpost = 0;
+$_G['group']['allowimgcontent'] = 0;
 $showthreadsorts = 0;
 $quotemessage = '';
 
@@ -318,6 +319,7 @@ if(!submitcheck('replysubmit', 0, $seccodecheck, $secqaacheck)) {
 		'noticeauthor' => $_GET['noticeauthor'],
 		'from' => $_GET['from'],
 		'sechash' => $_GET['sechash'],
+		'geoloc' => diconv($_GET['geoloc'], 'UTF-8'),
 	);
 
 
@@ -406,6 +408,7 @@ if(!submitcheck('replysubmit', 0, $seccodecheck, $secqaacheck)) {
 	$modpost->attach_after_methods('newreply', $afmethods);
 
 	$return = $modpost->newreply($params);
+	$pid = $modpost->pid;
 
 	if($specialextra) {
 

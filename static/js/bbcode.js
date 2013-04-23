@@ -2,7 +2,7 @@
 	[Discuz!] (C)2001-2099 Comsenz Inc.
 	This is NOT a freeware, use is subject to license terms
 
-	$Id: bbcode.js 32679 2013-02-28 08:57:42Z monkey $
+	$Id: bbcode.js 32880 2013-03-19 09:39:41Z monkey $
 */
 
 var re, DISCUZCODE = [];
@@ -136,7 +136,7 @@ function bbcode2html(str) {
 			str = str.replace(/\[img=(\d{1,4})[x|\,](\d{1,4})\]\s*([^\[\<\r\n]+?)\s*\[\/img\]/ig, function ($1, $2, $3, $4) {return '<img' + ($2 > 0 ? ' width="' + $2 + '"' : '') + ($3 > 0 ? ' height="' + $3 + '"' : '') + ' src="' + $4 + '" border="0" alt="" />'});
 		} else {
 			str = str.replace(/\[img\]\s*([^\[\<\r\n]+?)\s*\[\/img\]/ig, '<a href="$1" target="_blank">$1</a>');
-			str = str.replace(/\[img=(\d{1,4})[x|\,](\d{1,4})\]\s*([^\[\<\r\n]+?)\s*\[\/img\]/ig, '<a href="$1" target="_blank">$1</a>');
+			str = str.replace(/\[img=(\d{1,4})[x|\,](\d{1,4})\]\s*([^\[\<\r\n]+?)\s*\[\/img\]/ig, '<a href="$3" target="_blank">$3</a>');
 		}
 	}
 
@@ -353,6 +353,7 @@ function html2bbcode(str) {
 
 	if(!fetchCheckbox('bbcodeoff') && allowbbcode) {
 		str = preg_replace([
+			'<table[^>]*float:\\\s*(left|right)[^>]*><tbody><tr><td>\\\s*([\\\s\\\S]+?)\\\s*<\/td><\/tr></tbody><\/table>',
 			'<table([^>]*(width|background|background-color|backcolor)[^>]*)>',
 			'<table[^>]*>',
 			'<tr[^>]*(?:background|background-color|backcolor)[:=]\\\s*(["\']?)([\(\)\\\s%,#\\\w]+)(\\1)[^>]*>',
@@ -363,7 +364,10 @@ function html2bbcode(str) {
 			'<\/t[dh]>',
 			'<\/tr>',
 			'<\/table>',
+			'<h\\\d[^>]*>',
+			'<\/h\\\d>'
 		], [
+			function($1, $2, $3) {return '[float=' + $2 + ']' + $3 + '[/float]';},
 			function($1, $2) {return tabletag($2);},
 			'[table]\n',
 			function($1, $2, $3) {return '[tr=' + $3 + ']';},
@@ -374,6 +378,8 @@ function html2bbcode(str) {
 			'[/td]',
 			'[/tr]\n',
 			'[/table]',
+			'[b]',
+			'[/b]'
 		], str);
 
 		str = str.replace(/<h([0-9]+)[^>]*>([\s\S]*?)<\/h\1>/ig, function($1, $2, $3) {return "[size=" + (7 - $2) + "]" + $3 + "[/size]\n\n";});

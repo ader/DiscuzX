@@ -4,7 +4,7 @@
  *      [Discuz!] (C)2001-2099 Comsenz Inc.
  *      This is NOT a freeware, use is subject to license terms
  *
- *      $Id: space_notice.php 31062 2012-07-12 07:33:12Z liulanbo $
+ *      $Id: space_notice.php 32790 2013-03-12 02:52:19Z liulanbo $
  */
 
 if(!defined('IN_DISCUZ')) {
@@ -24,6 +24,9 @@ $list = array();
 $mynotice = $count = 0;
 $multi = '';
 
+if(empty($_G['member']['category_num']['manage']) && !in_array($_G['adminid'], array(1,2,3))) {
+	unset($_G['notice_structure']['manage']);
+}
 $view = (!empty($_GET['view']) && (isset($_G['notice_structure'][$_GET[view]]) || in_array($_GET['view'], array('userapp'))))?$_GET['view']:'mypost';
 $actives = array($view=>' class="a"');
 $opactives[$view] = 'class="a"';

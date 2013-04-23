@@ -15,7 +15,7 @@ class discuz_upgrade {
 
 	var $upgradeurl = 'http://upgrade.discuz.com/DiscuzX/';
 	var $locale = 'SC';
-	var $charset = 'UTF8';
+	var $charset = 'GBK';
 
 	public function fetch_updatefile_list($upgradeinfo) {
 

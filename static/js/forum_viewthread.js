@@ -2,7 +2,7 @@
 	[Discuz!] (C)2001-2099 Comsenz Inc.
 	This is NOT a freeware, use is subject to license terms
 
-	$Id: forum_viewthread.js 32663 2013-02-28 06:57:30Z monkey $
+	$Id: forum_viewthread.js 33083 2013-04-18 12:08:03Z zhengqingpeng $
 */
 
 var replyreload = '', attachimgST = new Array(), zoomgroup = new Array(), zoomgroupinit = new Array();
@@ -514,7 +514,10 @@ function display_blocked_post() {
 		}
 		display("post_"+blockedPIDs[i]);
 	}
+	postlistreply = $('postlistreply').innerHTML;
+	$('hiddenpoststip').parentNode.removeChild($('postlistreply'));
 	$('hiddenpoststip').parentNode.removeChild($('hiddenpoststip'));
+	$('hiddenposts').innerHTML+='<div id="postlistreply" class="pl">'+postlistreply+'</div>';
 }
 
 function show_threadpage(pid, current, maxpage, ispreview) {
@@ -724,7 +727,14 @@ function autozoom(w, h, s) {
 	this.autozoomin();
 }
 
-function readmode(title, msg) {
+function readmode(title, pid) {
+
+	var imagelist = '';
+	for(i = 0;i < aimgcount[pid].length;i++) {
+		var src = $('aimg_'+aimgcount[pid][i]).getAttribute('file');
+		imagelist += '<div class="mbn"><img src="' + src + '" width="600" /></div>';
+	}
+	msg = $('postmessage_'+pid).innerHTML+imagelist;
 	msg = '<div style="width:800px;max-height:500px; overflow-y:auto; padding: 10px;" class="pcb">'+msg+'</div>';
 	showDialog(msg, 'info', title, null, 1);
 	var coverObj = $('fwin_dialog_cover');

@@ -4,7 +4,7 @@
  *      [Discuz!] (C)2001-2099 Comsenz Inc.
  *      This is NOT a freeware, use is subject to license terms
  *
- *      $Id: cache_setting.php 32571 2013-02-21 08:24:04Z monkey $
+ *      $Id: cache_setting.php 33004 2013-04-07 02:22:48Z zhengqingpeng $
  */
 
 if(!defined('IN_DISCUZ')) {
@@ -24,7 +24,7 @@ function build_cache_setting() {
 		'disallowfloat', 'allowviewuserthread', 'advtype', 'click', 'card', 'rewritestatus', 'rewriterule', 'privacy', 'focus',
 		'forumkeys', 'article_tags', 'verify', 'seotitle', 'seodescription', 'seokeywords', 'domain', 'ranklist', 'my_search_data',
 		'seccodedata', 'inviteconfig', 'advexpiration', 'allowpostcomment', /*(IN_MOBILE)*/ 'mobile', 'connect', 'upgrade', 'patch', 'strongpw',
-		'posttable_info', 'threadtable_info', 'profilegroup', 'antitheft', 'makehtml', 'guestviewthumb', 'grid'
+		'posttable_info', 'threadtable_info', 'profilegroup', 'antitheft', 'makehtml', 'guestviewthumb', 'grid', 'guesttipsinthread'
 		);
 
 	$data = array();
@@ -713,10 +713,12 @@ function get_cachedata_mainnav() {
 		$data['navs'][$id]['available'] = $nav['available'];
 		$nav['name'] = $nav['name'].($nav['title'] ? '<span>'.$nav['title'].'</span>' : '');
 		$subnavs = '';
-		foreach(C::t('common_nav')->fetch_all_subnav($nav['id']) as $subnav) {
-			$item = "<a href=\"$subnav[url]\" hidefocus=\"true\" ".($subnav['title'] ? "title=\"$subnav[title]\" " : '').($subnav['target'] == 1 ? "target=\"_blank\" " : '').parsehighlight($subnav['highlight']).">$subnav[name]</a>";
-			$liparam = !$nav['subtype'] || !$nav['subcols'] ? '' : ' style="width:'.sprintf('%1.1f', (1 / $nav['subcols']) * 100).'%"';
-			$subnavs .= '<li'.$liparam.'>'.$item.'</li>';
+		if(!($nav['identifier'] == 5 && $nav['type'] == 0)) {
+			foreach(C::t('common_nav')->fetch_all_subnav($nav['id']) as $subnav) {
+				$item = "<a href=\"$subnav[url]\" hidefocus=\"true\" ".($subnav['title'] ? "title=\"$subnav[title]\" " : '').($subnav['target'] == 1 ? "target=\"_blank\" " : '').parsehighlight($subnav['highlight']).">$subnav[name]</a>";
+				$liparam = !$nav['subtype'] || !$nav['subcols'] ? '' : ' style="width:'.sprintf('%1.1f', (1 / $nav['subcols']) * 100).'%"';
+				$subnavs .= '<li'.$liparam.'>'.$item.'</li>';
+			}
 		}
 		list($navid) = explode('.', basename($nav['url']));
 		if($nav['type'] || $navid == 'misc' || $nav['identifier'] == 6) {
@@ -750,6 +752,11 @@ function get_cachedata_mainnav() {
 				$data['navs'][$id]['available'] = 0;
 				continue;
 			}
+		}
+		if($nav['identifier'] == 5 && $nav['type'] == 0) {
+			$onmouseover = 'delayShow(this, function () {showMenu({\'ctrlid\':\'mn_userapp\',\'pos\':\'43!\',\'ctrlclass\':\'a\',\'duration\':2});showUserApp();})';
+			$data['menunavs'][] = '<div class="p_pop h_pop" id="'.$navid.'_menu" style="display: none"></div>';
+			$data['subnavs'][$navid] = '';
 		}
 
 		if($nav['logo']) {
@@ -940,6 +947,9 @@ function get_cachedata_topnav() {
 
 function get_cachedata_threadprofile() {
 	global $_G;
+	if(!helper_dbtool::isexisttable('forum_threadprofile')) {
+		return;
+	}
 	$threadprofiles = C::t('forum_threadprofile')->fetch_all();
 	$threadprofile_group = C::t('forum_threadprofile_group')->fetch_all();
 	$data = array();
