@@ -11,7 +11,7 @@ error_reporting(E_ALL);
 
 define('IN_DISCUZ', true);
 define('DISCUZ_ROOT', substr(dirname(__FILE__), 0, -12));
-define('DISCUZ_CORE_DEBUG', false);
+define('DISCUZ_CORE_DEBUG', true);
 define('DISCUZ_TABLE_EXTENDABLE', TRUE);
 
 set_exception_handler(array('core', 'handleException'));
@@ -128,13 +128,13 @@ class core
 
 
 	public static function handleError($errno, $errstr, $errfile, $errline) {
-		if($errno & DISCUZ_CORE_DEBUG) {
+		if($errno && DISCUZ_CORE_DEBUG) {
 			discuz_error::system_error($errstr, false, true, false);
 		}
 	}
 
 	public static function handleShutdown() {
-		if(($error = error_get_last()) && $error['type'] & DISCUZ_CORE_DEBUG) {
+		if(($error = error_get_last()) && $error['type'] && DISCUZ_CORE_DEBUG) {
 			discuz_error::system_error($error['message'], false, true, false);
 		}
 	}
