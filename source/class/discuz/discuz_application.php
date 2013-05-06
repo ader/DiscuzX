@@ -179,9 +179,9 @@ class discuz_application extends discuz_base{
 		$_G['basefilename'] = basename($_G['PHP_SELF']);
 		$sitepath = substr($_G['PHP_SELF'], 0, strrpos($_G['PHP_SELF'], '/'));
 		if(defined('IN_API')) {
-			$sitepath = preg_replace("/\/api\/?.*?$/i", '', $sitepath);
+			$sitepath = preg_replace('/\/api\/?.*?$/i', '', $sitepath);
 		} elseif(defined('IN_ARCHIVER')) {
-			$sitepath = preg_replace("/\/archiver/i", '', $sitepath);
+			$sitepath = preg_replace('/\/archiver/i', '', $sitepath);
 		}
 		$_G['isHTTPS'] = ($_SERVER['HTTPS'] && strtolower($_SERVER['HTTPS']) != 'off') ? true : false;
 		$_G['siteurl'] = dhtmlspecialchars('http'.($_G['isHTTPS'] ? 's' : '').'://'.$_SERVER['HTTP_HOST'].$sitepath.'/');
@@ -212,7 +212,7 @@ class discuz_application extends discuz_base{
 				$this->var['PHP_SELF'] = substr($_SERVER['SCRIPT_NAME'],0,$pos).'/'.$scriptName;
 			} else if(isset($_SERVER['DOCUMENT_ROOT']) && strpos($_SERVER['SCRIPT_FILENAME'],$_SERVER['DOCUMENT_ROOT']) === 0) {
 				$this->var['PHP_SELF'] = str_replace('\\','/',str_replace($_SERVER['DOCUMENT_ROOT'],'',$_SERVER['SCRIPT_FILENAME']));
-				$this->var['PHP_SELF'][0] != '/' && $this->var['PHP_SELF'] = '/'.$this->var['PHP_SELF'];
+				$this->var['PHP_SELF'][0] != '/' && ($this->var['PHP_SELF'] = '/'.$this->var['PHP_SELF']);
 			} else {
 				system_error('request_tainting');
 			}
