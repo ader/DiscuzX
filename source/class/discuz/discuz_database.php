@@ -431,7 +431,7 @@ class discuz_database_safecheck {
 			return '-3';
 		}
 
-		$clean = preg_replace("/[^a-z0-9_\-\(\)#\*\/\"]+/is", "", strtolower($clean));
+		$clean = preg_replace('/[^a-z0-9_\-\(\)#\*\/"]+/is', "", strtolower($clean));
 
 		if (self::$config['afullnote']) {
 			$clean = str_replace('/**/', '', $clean);
