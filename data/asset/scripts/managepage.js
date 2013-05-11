@@ -6,7 +6,7 @@
  * To change this template use File | Settings | File Templates.
  */
 jQuery(document).ready(function () {
-	jQuery("head").append('<link rel="stylesheet" href="./data/asset/scripts/lib/jquery-ui/themes/base/jquery.ui.all.css"><style>.ui-state-highlight { height: 1.5em; line-height: 1.2em;margin:2px;padding:5px; }</style>');
+	jQuery("head").append('<link rel="stylesheet" href="./data/asset/scripts/lib/jquery-ui/themes/base/jquery.ui.all.css"><style>.ui-state-highlight { height: 1.5em; line-height: 1.2em;margin:2px;padding:5px; } .ui-sortable{min-height:30px;}</style>');
 	jQuery('.title.flinks').css({background:'#F0F0F0 url(./template/yeei_dream1/css/yeei//title.png) repeat-x 0 100%'});
 	jQuery('.flink_block').css({border:'1px solid #ccc', margin:10})
 	$LAB
@@ -24,7 +24,8 @@ jQuery(document).ready(function () {
 				}
 			});
 			jQuery(".portal_block_summary ul").disableSelection();
-		});
+		})
+		.script('./data/asset/scripts/jquery.json-2.4.js');
 
 })
 
@@ -50,4 +51,37 @@ function flashPosition(){
 		}
 	})
 	//console.log(_update);
+}
+
+function listtojson(){
+	var objs = [];
+	jQuery('.flink_block').each(function(){
+		var obj = {};
+		var links = [];
+		obj.name = (jQuery(this).children(':first-child').children(':first-child').text());
+
+		jQuery(this).children(':first-child').next().children().each(function(){
+			//alert(jQuery(this).attr('uid'));
+			links.push({href:jQuery(this).children(':first-child').attr('href'),text:jQuery(this).children(':first-child').text()});
+		})
+		obj.links = links;
+		objs.push(obj);
+	});
+	//alert(jQuery.toJSON(objs));
+	//return;
+	jQuery.ajax({
+		type:"POST",
+		url:'ajax2.php',
+		contentType : 'application/json',
+		data:jQuery.toJSON(objs),
+		success:function(data,textStatus,jqXHR){
+			//alert('textStatus:'+textStatus+'<br />'+'data:'+data+'<br />jqXHR:'+jqXHR);
+			document.body.innerHTML += data;
+			//alert(data)
+			//alert(jqXHR.responseText)
+		},
+		error:function(data,textStatus,jqXHR){
+			alert('textStatus:'+textStatus+'<br />'+'data:'+data+'<br />jqXHR:'+jqXHR);
+		}
+	})
 }
