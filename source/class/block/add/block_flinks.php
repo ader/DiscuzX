@@ -79,9 +79,9 @@ class block_flinks {
 	 */
 	function getsetting() {
 		$settings = $this->setting;
-		$query = DB::query("SELECT * FROM ".DB::table('custom_usefullinks')." WHERE linktype='1' ORDER BY displayorder DESC");
+		$query = DB::query("SELECT title,pid FROM ".DB::table('vizto_flink'));
 		while($group = DB::fetch($query)) {
-			$settings['groupid']['value'][] = array($group['groupid'], $group['title']);
+			$settings['groupid']['value'][] = array($group['pid'], $group['title']);
 		}
 
 		return $settings;/**/
@@ -128,11 +128,14 @@ class block_flinks {
 			)
 		));*/
 		$returndata = array('html' => '', 'data' => null);
-		$query = DB::query("SELECT * FROM ".DB::table('custom_usefullinks')." WHERE linktype='0' AND groupid=".$parameter['groupid']." ORDER BY displayorder ASC");
-		$titleData = DB::fetch_first("SELECT title FROM ".DB::table('custom_usefullinks')." WHERE linktype='1' AND groupid=".$parameter['groupid']);
-		$returndata['html'] .= '<div class="flink_block"><div class="title flinks" groupid="'.$parameter['groupid'].'"><span class="titletext">'.$titleData['title'].'</span></div><ul>';
+		//$query = DB::query("SELECT * FROM ".DB::table('custom_usefullinks')." WHERE linktype='0' AND groupid=".$parameter['groupid']." ORDER BY displayorder ASC");
+		//$titleData = DB::fetch_first("SELECT title FROM ".DB::table('custom_usefullinks')." WHERE linktype='1' AND groupid=".$parameter['groupid']);
+		$query = DB::query('SELECT * FROM '.DB::table('vizto_flink').' WHERE pid='.$parameter['groupid']);
+		$data = DB::fetch($query);
+		$returndata['html'] .= '<div class="flink_block"><div class="title flinks" groupid="'.$parameter['groupid'].'"><span class="titletext">'.$data['title'].'</span></div><ul>';
+		$links = dunserialize($data['data']);
 		while($data = DB::fetch($query)){
-			$returndata['html'] .= '<li uid="'.$data['uid'].'"><a href="'.$data['url'].'" title="'.$data['title'].'" target="_blank">'.$data['title'].'</a> </li>';
+			$returndata['html'] .= '<li><a href="'.$data['href'].'" title="'.$data['text'].'" target="_blank">'.$data['text'].'</a> </li>';
 		}
 		$returndata['html'] .= '</ul></div>';
 		return $returndata;
