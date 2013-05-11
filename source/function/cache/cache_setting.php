@@ -4,7 +4,7 @@
  *      [Discuz!] (C)2001-2099 Comsenz Inc.
  *      This is NOT a freeware, use is subject to license terms
  *
- *      $Id: cache_setting.php 33004 2013-04-07 02:22:48Z zhengqingpeng $
+ *      $Id: cache_setting.php 33238 2013-05-08 07:29:37Z alicezhao $
  */
 
 if(!defined('IN_DISCUZ')) {
@@ -786,7 +786,7 @@ function get_cachedata_mainnav() {
 
 		$data['navs'][$id]['navid'] = $navid;
 		$data['navs'][$id]['level'] = $nav['level'];
-		$data['navs'][$id]['nav'] = "id=\"$navid\" ".($onmouseover ? 'onmouseover="'.$onmouseover.'"' : '')."><a href=\"$nav[url]\" hidefocus=\"true\" ".($nav['title'] ? "title=\"$nav[title]\" " : '').($nav['target'] == 1 ? "target=\"_blank\" " : '')." $nav[style]>$nav[name]</a";
+		$data['navs'][$id]['nav'] = "id=\"$navid\" ".($onmouseover ? 'onmouseover="'.$onmouseover.'"' : '')."><a href=\"$nav[url]\" hidefocus=\"true\" ".($nav['title'] ? "title=\"$nav[title]\" " : '').($nav['target'] == 1 ? "target=\"_blank\" " : '')." $nav[style]>$nav[name]".($nav['identifier'] == 5 && $nav['type'] == 0 ? '<b class="icon_down"></b>' : '')."</a";
 	}
 	$data['menunavs'] = implode('', $data['menunavs']);
 

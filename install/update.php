@@ -4,7 +4,7 @@
  *      [Discuz!] (C)2001-2099 Comsenz Inc.
  *      This is NOT a freeware, use is subject to license terms
  *
- *      $Id: update.php 32967 2013-03-28 10:57:48Z zhengqingpeng $
+ *      $Id: update.php 33157 2013-04-28 07:55:55Z theoliu $
  */
 
 include_once('../source/class/class_core.php');
@@ -17,7 +17,7 @@ $discuz = C::app();
 
 $discuz->cachelist = $cachelist;
 $discuz->init_cron = false;
-$discuz->init_setting = false;
+$discuz->init_setting = true;
 $discuz->init_user = false;
 $discuz->init_session = false;
 $discuz->init_misc = false;
@@ -66,6 +66,7 @@ if(!file_exists($sqlfile)) {
 	show_msg('SQL文件 '.$sqlfile.' 不存在');
 }
 $first_to_2_5 = !C::t('common_setting')->skey_exists('strongpw');
+$first_to_3_0 = !C::t('common_setting')->skey_exists('antitheft');
 if($_POST['delsubmit']) {
 	if(!empty($_POST['deltables'])) {
 		foreach ($_POST['deltables'] as $tname => $value) {
@@ -1338,62 +1339,11 @@ if($_GET['step'] == 'start') {
 		show_msg("域名设置升级完毕", "$theurl?step=data&op=$nextop");
 
 	} elseif($_GET['op'] == 'pm') {
-		$nextop = 'threadheat';
-		DB::query("UPDATE ".DB::table('common_member')." SET newpm='0'");
-		show_msg("新短消息状态重置完毕", "$theurl?step=data&op=$nextop");
-
-	} elseif($_GET['op'] == 'threadheat') {
 		$nextop = 'allowgetimage';
-		$starttid = intval($_GET['starttid']);
-		$endtid = 0;
-		$heatnumber = intval($_GET['heatnumber']);
-		if(!$heatnumber) {
-			$heatarr = unserialize(DB::result_first("SELECT svalue FROM ".DB::table('common_setting')." WHERE skey = 'heatthread' LIMIT 1"));
-			$heatnumber = $heatarr['guidelimit'];
+		if($first_to_3_0) {
+			DB::query("UPDATE ".DB::table('common_member')." SET newpm='0', newprompt='0'");
 		}
-
-		$startthread = DB::fetch_first('SELECT * FROM '.DB::table('forum_thread')." WHERE tid>$starttid ORDER BY tid ASC limit 1");
-		if($startthread) {
-			$startdata = strtotime(gmdate('Y-m-d', $startthread['dateline']))+86400;
-			$endthread = DB::fetch_first('SELECT * FROM '.DB::table('forum_thread')." WHERE tid>$starttid AND dateline<$startdata ORDER BY tid DESC limit 1");
-			$endtid = $endthread['tid'];
-			$daystr = gmdate('Ymd', $startthread['dateline']);
-			$query = DB::query("SELECT tid,fid,dateline,heats FROM ".DB::table('forum_thread')." WHERE tid>$starttid AND tid<=$endtid AND heats>=$heatnumber");
-			while($thread = DB::fetch($query)) {
-				$data[$thread['tid']] = array(
-						'cid' => 0,
-						'fid' => $thread['fid'],
-						'tid' => $thread['tid']
-				);
-				$fids[$thread['fid']] = array('fid' => $thread['fid'], 'dateline' => $daystr, 'hotnum' => 0);
-				$tids[$thread['fid']][$thread['tid']] = $thread['tid'];
-			}
-			if($data) {
-				$cids = C::t('forum_threadcalendar')->fetch_all_by_fid_dateline(array_keys($fids), $daystr);
-				foreach($cids as $fid => $cinfo) {
-					$hotnum[$cinfo['cid']] = count($tids[$fid]);
-					foreach($tids[$fid] as $tid) {
-						$data[$tid]['cid'] = $cinfo['cid'];
-					}
-					unset($fids[$fid]);
-				}
-				if($fids) {
-					C::t('forum_threadcalendar')->insert_multiterm($fids);
-					foreach(C::t('forum_threadcalendar')->fetch_all_by_fid_dateline(array_keys($fids), $daystr) as $fid => $cinfo) {
-						$hotnum[$cinfo['cid']] = count($tids[$fid]);
-						foreach($tids[$fid] as $tid) {
-							$data[$tid]['cid'] = $cinfo['cid'];
-						}
-					}
-				}
-				C::t('forum_threadhot')->insert_multiterm($data);
-				foreach($hotnum as $cid => $num) {
-					C::t('forum_threadcalendar')->update($cid, array('hotnum' => $num));
-				}
-			}
-			show_msg("正在处理从".gmdate('Y-m-d', $startthread['dateline'])."开始<strong> Tid>{$starttid} </strong>的热帖", "$theurl?step=data&op=threadheat&starttid=$endtid&heatnumber=$heatnumber");
-		}
-		show_msg("热帖处理完毕", "$theurl?step=data&op=$nextop");
+		show_msg("新短消息状态重置完毕", "$theurl?step=data&op=$nextop");
 	} elseif($_GET['op'] == 'allowgetimage') {
 		$nextop = 'verify';
 		if(!DB::result_first("SELECT COUNT(*) FROM ".DB::table('common_usergroup_field')." WHERE allowgetimage='1'")) {
@@ -1920,7 +1870,24 @@ if($_GET['step'] == 'start') {
 	show_msg("默认风格已恢复，进入下一步", "$theurl?step=cache");
 
 } elseif ($_GET['step'] == 'cache') {
+	$appService = Cloud::loadClass('Service_App');
+	try {
+		$cloudstatus = $appService->checkCloudStatus();
+	} catch (Exception $e) {
+	}
+	$result = false;
+	if($cloudstatus == 'cloud' && !$appService->getCloudAppStatus('search')) {
+		try{
+			$cloudAppService = Cloud::loadClass('Service_Client_Cloud');
+			$result = $cloudAppService->appOpen();
+		} catch(Exception $e) {
+		}
+	}
 
+
+	if($result == true) {
+		$opensoso = '<br><br>友情提示：<br>为更好的降低论坛搜索时的数据压力，本次升级已经帮本站开通纵横搜索服务。<br>你可以在 <a href=\\\'../admin.php?frames=yes&action=cloud&operation=search\\\' target=\\\'_blank\\\'>站点后台-&gt;云平台-&gt;纵横搜索 进行管理</a>。';
+	}
 	if(!$devmode && @$fp = fopen($lockfile, 'w')) {
 		fwrite($fp, ' ');
 		fclose($fp);
@@ -1936,7 +1903,7 @@ if($_GET['step'] == 'start') {
 	if($_GET['from']) {
 		show_msg('<span id="finalmsg">缓存更新中，请稍候 ...</span><iframe src="../misc.php?mod=initsys" style="display:none;" onload="window.location.href=\''.$_GET['from'].'\'"></iframe>');
 	} else {
-		show_msg('<span id="finalmsg">缓存更新中，请稍候 ...</span><iframe src="../misc.php?mod=initsys" style="display:none;" onload="document.getElementById(\'finalmsg\').innerHTML = \'恭喜，数据库结构升级完成！为了数据安全，请删除本文件。\'"></iframe>');
+		show_msg('<span id="finalmsg">缓存更新中，请稍候 ...</span><iframe src="../misc.php?mod=initsys" style="display:none;" onload="document.getElementById(\'finalmsg\').innerHTML = \'恭喜，数据库结构升级完成！为了数据安全，请删除本文件。'.$opensoso.'\'"></iframe>');
 	}
 
 }

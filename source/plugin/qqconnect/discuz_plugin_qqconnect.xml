@@ -179,8 +179,8 @@
 				<item id="connect_config_desc_title1"><![CDATA[用QQ帐号轻松登录]]></item>
 				<item id="connect_config_desc_content1"><![CDATA[无需记住本站的帐号和密码，随时使用QQ帐号密码轻松登录]]></item>
 				<item id="connect_config_newpassword_comment"><![CDATA[您目前使用的是QQ帐号绑定本站，您可以在这里设置独立密码，只有设置了独立密码后本站需要填写密码的相应功能才可使用]]></item>
-				<item id="connect_config_desc_title2"><![CDATA[发表主题同时推送到QQ空间和腾讯微博]]></item>
-				<item id="connect_config_desc_content2"><![CDATA[将您的论坛主题推送到QQ空间和腾讯微博，让好友全方面了解您]]></item>
+				<item id="connect_config_desc_title2"><![CDATA[发表主题同时推送到腾讯微博]]></item>
+				<item id="connect_config_desc_content2"><![CDATA[将您的论坛主题推送到腾讯微博，让好友全方面了解您]]></item>
 				<item id="connect_config_desc_title3"><![CDATA[把本站精彩内容分享到QQ空间、腾讯微博和腾讯朋友]]></item>
 				<item id="connect_config_desc_content3"><![CDATA[每一个精彩内容绝不放过，简单快捷的将论坛主题分享给好友和听众]]></item>
 				<item id="connect_config_profile"><![CDATA[个人资料]]></item>
@@ -195,7 +195,7 @@
 				<item id="connect_config_modify_authorization"><![CDATA[修改本站的授权？]]></item>
 				<item id="connect_config_modify_authorization_desc"><![CDATA[您可根据自己的需要随时增加、取消QQ帐号对本站的授权，在确保隐私的前提下使用各项功能和服务。]]></item>
 				<item id="connect_config_set_password"><![CDATA[设置本站密码？]]></item>
-				<item id="connect_config_sync_post"><![CDATA[同步动态到QQ空间与腾讯微博？]]></item>
+				<item id="connect_config_sync_post"><![CDATA[同步动态到腾讯微博？]]></item>
 				<item id="connect_config_sync_post_desc1"><![CDATA[您的好友或听众能够看到您发表的主题和记录。]]></item>
 				<item id="connect_config_sync_post_desc2"><![CDATA[马上完善授权，您将可以把本站精彩内容分享到QQ空间、腾讯微博和腾讯朋友，跟大家分享每个精彩瞬间。]]></item>
 				<item id="connect_config_unbind_desc1"><![CDATA[您当前是使用QQ帐号绑定到 {$_G[setting][bbname]}]]></item>

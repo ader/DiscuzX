@@ -420,16 +420,10 @@ function avatar($uid, $size = 'middle', $returnsrc = FALSE, $real = FALSE, $stat
 function lang($file, $langvar = null, $vars = array(), $default = null) {
 	global $_G;
 	$fileinput = $file;
-	/*
 	list($path, $file) = explode('/', $file);
 	if(!$file) {
 		$file = $path;
 		$path = '';
-	}
-	*/
-	$path = '';
-	if(strpos($file, '/') !== false){
-		list($path, $file) = explode('/', $file);
 	}
 	if(strpos($file, ':') !== false) {
 		$path = 'plugin';
