@@ -129,7 +129,8 @@ class core
 
 
 	public static function handleError($errno, $errstr, $errfile, $errline) {
-		return vizto_exception::Error_Handler($errno, $errstr, $errfile, $errline);
+		$args = func_get_args();
+		return call_user_func_array(array('vizto_exception', 'Error_Handler'), $args);//vizto_exception::Error_Handler($errno, $errstr, $errfile, $errline);
 		if($errno && DISCUZ_CORE_DEBUG) {
 			discuz_error::system_error($errstr, false, true, false);
 		}
