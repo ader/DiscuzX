@@ -1,4 +1,4 @@
-<?php
+<?php !defined('IN_DISCUZ') && exit('Access Denied');
 
 /**
  *      [Discuz!] (C)2001-2099 Comsenz Inc.
@@ -7,27 +7,23 @@
  *      $Id: table_custom_usefullinks.php 31559 2012-09-10 03:23:40Z liulanbo $
  */
 
-if(!defined('IN_DISCUZ')) {
-	exit('Access Denied');
-}
 
-class table_custom_usefullinks extends discuz_table
-{
+class table_custom_flink extends discuz_table {
+
 	public function __construct() {
-
-		$this->_table = 'custom_usefullinks';
+		$this->_table = 'vizto_flink';
 		$this->_pk    = 'uid';
-
 		parent::__construct();
 	}
 
-	public function fetch_groups(){
-		return DB::fetch_all("SELECT * FROM %t WHERE linktype=%d", array($this->_table, 1));
+	public function fetch_groups() {
+		return DB::fetch_all("SELECT pid,title FROM %t", array($this->_table));
 	}
 
-	public function fetch_links_by_groups($groupid){
-		return DB::fetch_all("SELECT * FROM %t WHERE linktype=%d AND groupid=%d ORDER BY displayorder ASC", array($this->_table, 0, $groupid));
+	public function fetch_links_by_group($groupid) {
+		return DB::fetch_all("SELECT * FROM %t WHERE pid=%d", array($this->_table, $groupid));
 	}
+	/*
 	public function fetch_link_by_uid($uid){
 		return DB::fetch_first('SELECT * FROM %t WHERE uid=%d', array($this->_table, $uid));
 	}
@@ -61,11 +57,8 @@ class table_custom_usefullinks extends discuz_table
 	public function delete_by_groupid($groupid){
 		return DB::delete($this->_table, DB::field('groupid', $groupid));
 	}
+	*/
 }
-
-
-
-
 
 
 ?>
