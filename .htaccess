@@ -35,6 +35,9 @@ ErrorDocument 500 "服务器内部错误"
 #504	网关超时
 #505	HTTP版本不支持
 
+RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+RewriteRule ^ http%{ENV:protossl}://%1%{REQUEST_URI} [L,R=301]
+
 # Rewrite 系统规则请勿修改
 RewriteCond %{QUERY_STRING} ^(.*)$
 RewriteRule ^topic-(.+)\.html$ portal.php?mod=topic&topic=$1&%1
