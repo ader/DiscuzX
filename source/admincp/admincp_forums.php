@@ -4,7 +4,7 @@
  *      [Discuz!] (C)2001-2099 Comsenz Inc.
  *      This is NOT a freeware, use is subject to license terms
  *
- *      $Id: admincp_forums.php 32620 2013-02-27 02:03:46Z zhengqingpeng $
+ *      $Id: admincp_forums.php 33278 2013-05-14 06:11:45Z nemohou $
  */
 
 if(!defined('IN_DISCUZ') || !defined('IN_ADMINCP')) {
@@ -473,7 +473,7 @@ var rowtypedata = [
 
 		$query = C::t('forum_access')->fetch_all_by_fid_uid($source);
 		foreach($query as $access) {
-			C::t('forum_access')->insert(array('uid' => $access['uid'], 'fid' => $target, 'allowview' => $access['allowview'], 'allowpost' => $access['allowpost'], 'allowreply' => $access['allowreply'], 'allowgetattach' => $access['allowgetattach']));
+			C::t('forum_access')->insert(array('uid' => $access['uid'], 'fid' => $target, 'allowview' => $access['allowview'], 'allowpost' => $access['allowpost'], 'allowreply' => $access['allowreply'], 'allowgetattach' => $access['allowgetattach']), false, true);
 		}
 		C::t('forum_access')->delete_by_fid($source);
 		C::t('forum_thread')->clear_cache(array($source,$target), 'forumdisplay_');
@@ -1878,6 +1878,7 @@ EOT;
 			$log_handler = Cloud::loadClass('Cloud_Service_SearchHelper');
 			$log_handler->myThreadLog('delforum', array('fid' => $fid));
 			C::t('forum_forum')->delete_by_fid($fid);
+			C::t('common_nav')->delete_by_type_identifier(5, $fid);
 			C::t('home_favorite')->delete_by_id_idtype($fid, 'fid');
 			C::t('forum_moderator')->delete_by_fid($fid);
 			C::t('common_member_forum_buylog')->delete_by_fid($fid);
@@ -1973,7 +1974,9 @@ EOT;
 		$fieldarray = array_merge($fields['forums'], $fields['forumfields']);
 		$listfields = array_diff($fieldarray, array_merge($delfields['forums'], $delfields['forumfields']));
 		foreach($listfields as $field) {
-			$optselect .= '<option value="'.$field.'">'.($lang['project_option_forum_'.$field] ? $lang['project_option_forum_'.$field] : $field).'</option>';
+			if(isset($lang['project_option_forum_'.$field])) {
+				$optselect .= '<option value="'.$field.'">'.$lang['project_option_forum_'.$field].'</option>';
+			}
 		}
 		$optselect .= '</select>';
 		shownav('forum', 'forums_copy');

@@ -4,7 +4,7 @@
  *      [Discuz!] (C)2001-2099 Comsenz Inc.
  *      This is NOT a freeware, use is subject to license terms
  *
- *      $Id: update.php 32692 2013-03-01 01:25:46Z zhengqingpeng $
+ *      $Id: update.php 33157 2013-04-28 07:55:55Z theoliu $
  */
 
 include_once('../source/class/class_core.php');
@@ -17,7 +17,7 @@ $discuz = C::app();
 
 $discuz->cachelist = $cachelist;
 $discuz->init_cron = false;
-$discuz->init_setting = false;
+$discuz->init_setting = true;
 $discuz->init_user = false;
 $discuz->init_session = false;
 $discuz->init_misc = false;
@@ -66,6 +66,7 @@ if(!file_exists($sqlfile)) {
 	show_msg('SQL文件 '.$sqlfile.' 不存在');
 }
 $first_to_2_5 = !C::t('common_setting')->skey_exists('strongpw');
+$first_to_3_0 = !C::t('common_setting')->skey_exists('antitheft');
 if($_POST['delsubmit']) {
 	if(!empty($_POST['deltables'])) {
 		foreach ($_POST['deltables'] as $tname => $value) {
@@ -530,88 +531,88 @@ if($_GET['step'] == 'start') {
 			$profilegroupnew = array(
 				'base' =>
 				array (
-					'available' => 1,
-					'displayorder' => 0,
-					'title' => '基本资料',
-					'field' =>
-					array (
-						'realname' => 'realname',
-						'gender' => 'gender',
-						'birthday' => 'birthday',
-						'birthcity' => 'birthcity',
-						'residecity' => 'residecity',
-						'residedist' => 'residedist',
-						'affectivestatus' => 'affectivestatus',
-						'lookingfor' => 'lookingfor',
-						'bloodtype' => 'bloodtype',
-						'field1' => 'field1',
-						'field2' => 'field2',
-						'field3' => 'field3',
-						'field4' => 'field4',
-						'field5' => 'field5',
-						'field6' => 'field6',
-						'field7' => 'field7',
-						'field8' => 'field8',
-					),
+				  'available' => 1,
+				  'displayorder' => 0,
+				  'title' => '基本资料',
+				  'field' =>
+				  array (
+					'realname' => 'realname',
+					'gender' => 'gender',
+					'birthday' => 'birthday',
+					'birthcity' => 'birthcity',
+					'residecity' => 'residecity',
+					'residedist' => 'residedist',
+					'affectivestatus' => 'affectivestatus',
+					'lookingfor' => 'lookingfor',
+					'bloodtype' => 'bloodtype',
+					'field1' => 'field1',
+					'field2' => 'field2',
+					'field3' => 'field3',
+					'field4' => 'field4',
+					'field5' => 'field5',
+					'field6' => 'field6',
+					'field7' => 'field7',
+					'field8' => 'field8',
+				  ),
 				),
 				'contact' =>
 				array (
-					'title' => '联系方式',
-					'available' => '1',
-					'displayorder' => '1',
-					'field' =>
-					array (
-						'telephone' => 'telephone',
-						'mobile' => 'mobile',
-						'icq' => 'icq',
-						'qq' => 'qq',
-						'yahoo' => 'yahoo',
-						'msn' => 'msn',
-						'taobao' => 'taobao',
-					),
+				  'title' => '联系方式',
+				  'available' => '1',
+				  'displayorder' => '1',
+				  'field' =>
+				  array (
+					'telephone' => 'telephone',
+					'mobile' => 'mobile',
+					'icq' => 'icq',
+					'qq' => 'qq',
+					'yahoo' => 'yahoo',
+					'msn' => 'msn',
+					'taobao' => 'taobao',
+				  ),
 				),
 				'edu' =>
 				array (
-					'available' => 1,
-					'displayorder' => 2,
-					'title' => '教育情况',
-					'field' =>
-					array (
-						'graduateschool' => 'graduateschool',
-						'education' => 'education',
-					),
+				  'available' => 1,
+				  'displayorder' => 2,
+				  'title' => '教育情况',
+				  'field' =>
+				  array (
+					'graduateschool' => 'graduateschool',
+					'education' => 'education',
+				  ),
 				),
 				'work' =>
 				array (
-					'available' => 1,
-					'displayorder' => 3,
-					'title' => '工作情况',
-					'field' =>
-					array (
-						'occupation' => 'occupation',
-						'company' => 'company',
-						'position' => 'position',
-						'revenue' => 'revenue',
-					),
+				  'available' => 1,
+				  'displayorder' => 3,
+				  'title' => '工作情况',
+				  'field' =>
+				  array (
+					'occupation' => 'occupation',
+					'company' => 'company',
+					'position' => 'position',
+					'revenue' => 'revenue',
+				  ),
 				),
 				'info' =>
 				array (
-					'title' => '个人信息',
-					'available' => '1',
-					'displayorder' => '4',
-					'field' =>
-					array (
-						'idcardtype' => 'idcardtype',
-						'idcard' => 'idcard',
-						'address' => 'address',
-						'zipcode' => 'zipcode',
-						'site' => 'site',
-						'bio' => 'bio',
-						'interest' => 'interest',
-						'sightml' => 'sightml',
-						'customstatus' => 'customstatus',
-						'timeoffset' => 'timeoffset',
-					),
+				  'title' => '个人信息',
+				  'available' => '1',
+				  'displayorder' => '4',
+				  'field' =>
+				  array (
+					'idcardtype' => 'idcardtype',
+					'idcard' => 'idcard',
+					'address' => 'address',
+					'zipcode' => 'zipcode',
+					'site' => 'site',
+					'bio' => 'bio',
+					'interest' => 'interest',
+					'sightml' => 'sightml',
+					'customstatus' => 'customstatus',
+					'timeoffset' => 'timeoffset',
+				  ),
 				),
 			);
 			$newsettings['profilegroup'] = $profilegroupnew;
@@ -780,9 +781,9 @@ if($_GET['step'] == 'start') {
 			}
 			unset($memory['forum_post']);
 			$newsettings['memory'] = array_merge(array('common_member' => 0,'common_member_count' => 0,'common_member_status' => 0,'common_member_profile' => 0,
-				'common_member_field_home' => 0,'common_member_field_forum' => 0,'common_member_verify' => 0,
-				'forum_thread' => 172800, 'forum_thread_forumdisplay' => 300, 'forum_collectionrelated' => 0, 'forum_postcache' => 300,
-				'forum_collection' => 300,'home_follow' => 86400, 'forumindex' => 30, 'diyblock' => 300, 'diyblockoutput' => 30), $memory);
+											'common_member_field_home' => 0,'common_member_field_forum' => 0,'common_member_verify' => 0,
+											'forum_thread' => 172800, 'forum_thread_forumdisplay' => 300, 'forum_collectionrelated' => 0, 'forum_postcache' => 300,
+											'forum_collection' => 300,'home_follow' => 86400, 'forumindex' => 30, 'diyblock' => 300, 'diyblockoutput' => 30), $memory);
 		}
 
 		if(!isset($settings['blockmaxaggregationitem'])) {
@@ -803,7 +804,7 @@ if($_GET['step'] == 'start') {
 			$newsettings['threadhotreplies'] = 3;
 			$newsettings['threadfilternum'] = 10;
 			$newsettings['hidefilteredpost'] = 1;
-			$newsettings['nofilteredpost'] = 1;
+			$newsettings['nofilteredpost'] = 0;
 			$newsettings['filterednovote'] = 1;
 		}
 
@@ -817,12 +818,11 @@ if($_GET['step'] == 'start') {
 			$newsettings['darkroom'] = '1';
 		}
 
-		if(!isset($settings['showsignin'])) {
-			$newsettings['showsignin'] = 1;
-		}
-
 		if(!isset($settings['showfjump'])) {
 			$newsettings['showfjump'] = 1;
+		}
+		if(!isset($settings['grid'])) {
+			$newsettings['grid'] = 'a:8:{s:8:"showgrid";s:1:"0";s:8:"gridtype";s:1:"0";s:8:"textleng";s:2:"30";s:4:"fids";a:1:{i:0;i:0;}s:9:"highlight";s:1:"1";s:11:"targetblank";s:1:"1";s:8:"showtips";s:1:"1";s:9:"cachelife";s:3:"600";}';
 		}
 
 		if(!empty($newsettings)) {
@@ -1020,10 +1020,10 @@ if($_GET['step'] == 'start') {
 					$nav['available'] = $homestatus ? $nav['available'] : -1;
 					if(!$navid) {
 						DB::update('common_nav', array('available' => $homestatus ? 0 : -1),
-							"navtype IN(0, 2, 3) AND type=0 AND identifier IN('feed', 'blog', 'album', 'share', 'doing', 'wall', '12', '13', '14', '15')");
+								"navtype IN(0, 2, 3) AND type=0 AND identifier IN('feed', 'blog', 'album', 'share', 'doing', 'wall', '12', '13', '14', '15')");
 						if($homestatus) {
 							DB::update('common_nav', array('available' => 1),
-								"navtype=2 AND type=0 AND identifier IN('feed', 'blog', 'album', 'share', 'doing', 'wall')");
+									"navtype=2 AND type=0 AND identifier IN('feed', 'blog', 'album', 'share', 'doing', 'wall')");
 						}
 						DB::query("REPLACE INTO ".DB::table('common_setting')." VALUES ('homestyle', '1'),('homepagestyle', '1'),('feedstatus', '$homestatus'),('blogstatus', '$homestatus'),('doingstatus', '$homestatus'),('albumstatus', '$homestatus'),('sharestatus', '$homestatus'),('wallstatus', '$homestatus')");
 					}
@@ -1339,62 +1339,11 @@ if($_GET['step'] == 'start') {
 		show_msg("域名设置升级完毕", "$theurl?step=data&op=$nextop");
 
 	} elseif($_GET['op'] == 'pm') {
-		$nextop = 'threadheat';
-		DB::query("UPDATE ".DB::table('common_member')." SET newpm='0'");
-		show_msg("新短消息状态重置完毕", "$theurl?step=data&op=$nextop");
-
-	} elseif($_GET['op'] == 'threadheat') {
 		$nextop = 'allowgetimage';
-		$starttid = intval($_GET['starttid']);
-		$endtid = 0;
-		$heatnumber = intval($_GET['heatnumber']);
-		if(!$heatnumber) {
-			$heatarr = unserialize(DB::result_first("SELECT svalue FROM ".DB::table('common_setting')." WHERE skey = 'heatthread' LIMIT 1"));
-			$heatnumber = $heatarr['guidelimit'];
+		if($first_to_3_0) {
+			DB::query("UPDATE ".DB::table('common_member')." SET newpm='0', newprompt='0'");
 		}
-
-		$startthread = DB::fetch_first('SELECT * FROM '.DB::table('forum_thread')." WHERE tid>$starttid ORDER BY tid ASC limit 1");
-		if($startthread) {
-			$startdata = strtotime(gmdate('Y-m-d', $startthread['dateline']))+86400;
-			$endthread = DB::fetch_first('SELECT * FROM '.DB::table('forum_thread')." WHERE tid>$starttid AND dateline<$startdata ORDER BY tid DESC limit 1");
-			$endtid = $endthread['tid'];
-			$daystr = gmdate('Ymd', $startthread['dateline']);
-			$query = DB::query("SELECT tid,fid,dateline,heats FROM ".DB::table('forum_thread')." WHERE tid>$starttid AND tid<=$endtid AND heats>=$heatnumber");
-			while($thread = DB::fetch($query)) {
-				$data[$thread['tid']] = array(
-					'cid' => 0,
-					'fid' => $thread['fid'],
-					'tid' => $thread['tid']
-				);
-				$fids[$thread['fid']] = array('fid' => $thread['fid'], 'dateline' => $daystr, 'hotnum' => 0);
-				$tids[$thread['fid']][$thread['tid']] = $thread['tid'];
-			}
-			if($data) {
-				$cids = C::t('forum_threadcalendar')->fetch_all_by_fid_dateline(array_keys($fids), $daystr);
-				foreach($cids as $fid => $cinfo) {
-					$hotnum[$cinfo['cid']] = count($tids[$fid]);
-					foreach($tids[$fid] as $tid) {
-						$data[$tid]['cid'] = $cinfo['cid'];
-					}
-					unset($fids[$fid]);
-				}
-				if($fids) {
-					C::t('forum_threadcalendar')->insert_multiterm($fids);
-					foreach(C::t('forum_threadcalendar')->fetch_all_by_fid_dateline(array_keys($fids), $daystr) as $fid => $cinfo) {
-						$hotnum[$cinfo['cid']] = count($tids[$fid]);
-						foreach($tids[$fid] as $tid) {
-							$data[$tid]['cid'] = $cinfo['cid'];
-						}
-					}
-				}
-				C::t('forum_threadhot')->insert_multiterm($data);
-				foreach($hotnum as $cid => $num) {
-					C::t('forum_threadcalendar')->update($cid, array('hotnum' => $num));
-				}
-			}
-			show_msg("正在处理从".gmdate('Y-m-d', $startthread['dateline'])."开始<strong> Tid>{$starttid} </strong>的热帖", "$theurl?step=data&op=threadheat&starttid=$endtid&heatnumber=$heatnumber");
-		}
-		show_msg("热帖处理完毕", "$theurl?step=data&op=$nextop");
+		show_msg("新短消息状态重置完毕", "$theurl?step=data&op=$nextop");
 	} elseif($_GET['op'] == 'allowgetimage') {
 		$nextop = 'verify';
 		if(!DB::result_first("SELECT COUNT(*) FROM ".DB::table('common_usergroup_field')." WHERE allowgetimage='1'")) {
@@ -1418,20 +1367,20 @@ if($_GET['step'] == 'start') {
 		$updateverify = $_GET['updateverify'] ? true : false;
 		if(!isset($verifys[6])) {
 			$verifys[6] = array(
-				'title' => '实名认证',
-				'available' => $settings['realname'],
-				'showicon' => 0,
-				'viewrealname' => 0,
-				'field' => array('realname' => realname),
-				'icon' => ''
-			);
+					'title' => '实名认证',
+					'available' => $settings['realname'],
+					'showicon' => 0,
+					'viewrealname' => 0,
+					'field' => array('realname' => realname),
+					'icon' => ''
+				);
 			$verifys[7] = array(
-				'title' => '视频认证',
-				'available' => $settings['videophoto'],
-				'showicon' => 0,
-				'viewvideophoto' => $settings['video_allowviewspace'],
-				'icon' => ''
-			);
+					'title' => '视频认证',
+					'available' => $settings['videophoto'],
+					'showicon' => 0,
+					'viewvideophoto' => $settings['video_allowviewspace'],
+					'icon' => ''
+				);
 			if($verifys['enabled'] && ($settings['realname'] || $settings['videophoto'])) {
 				$verifys['enabled'] = 1;
 			}
@@ -1449,9 +1398,9 @@ if($_GET['step'] == 'start') {
 					$n = intval($value['uid']);
 					$havauser = DB::result_first("SELECT COUNT(*) FROM ".DB::table('common_member_verify')." WHERE uid='$n'");
 					$data = array(
-						'verify6' => '1',
-						'verify7' => $value['videophotostatus'] ? 1 : 0,
-					);
+							'verify6' => '1',
+							'verify7' => $value['videophotostatus'] ? 1 : 0,
+						);
 					if($havauser) {
 						DB::update('common_member_verify', $data, array('uid' => $n));
 					} else {
@@ -1703,7 +1652,7 @@ if($_GET['step'] == 'start') {
 		if(!DB::result_first("SELECT COUNT(*) FROM ".DB::table("forum_threadprofile")." WHERE global=1")) {
 			DB::query("INSERT INTO ".DB::table("forum_threadprofile")." (`id`, `name`, `template`, `global`) VALUES
 				  (1, '默认方案', 'a:2:{s:4:\"left\";s:399:\"{numbercard}\r\n{groupicon}<p>{*}</p>{/groupicon}\r\n{authortitle}<p><em>{*}</em></p>{/authortitle}\r\n{customstatus}<p class=\"xg1\">{*}</p>{/customstatus}\r\n{star}<p>{*}</p>{/star}\r\n{upgradeprogress}<p>{*}</p>{/upgradeprogress}\r\n<dl class=\"pil cl\">\r\n\t<dt>{baseinfo=credits,1}</dt><dd>{baseinfo=credits,0}</dd>\r\n</dl>\r\n{medal}<p class=\"md_ctrl\">{*}</p>{/medal}\r\n<dl class=\"pil cl\">{baseinfo=field_qq,0}</dl>\";s:3:\"top\";s:82:\"<dl class=\"cl\">\r\n<dt>{baseinfo=credits,1}</dt><dd>{baseinfo=credits,0}</dd>\r\n</dl>\";}', 1);");
-			DB::query("REPLACE INTO pre_forum_bbcode VALUES ('2','2','qq','bb_qq.gif','<a href=\"http://wpa.qq.com/msgrd?V=3&Uin={1}&amp;Site=[Discuz!]&amp;from=discuz&amp;Menu=yes\" target=\"_blank\"><img src=\"static/image/common/qq_big.gif\" border=\"0\"></a>','[qq]688888[/qq]','显示 QQ 在线状态，点这个图标可以和他（她）聊天','1','请输入 QQ 号码:<a href=\"\" class=\"xi2\" onclick=\"this.href=\'http://wp.qq.com/set.html?from=discuz&uin=\'+$(\'e_cst1_qq_param_1\').value\" target=\"_blank\" style=\"float:right;\">设置QQ在线状态&nbsp;&nbsp;</a>','1','21','1	2	3	10	11	12	13	14	15	16	17	18	19');");
+			DB::query("REPLACE INTO ".DB::table("forum_bbcode")." VALUES ('2','2','qq','bb_qq.gif','<a href=\"http://wpa.qq.com/msgrd?V=3&Uin={1}&amp;Site=[Discuz!]&amp;from=discuz&amp;Menu=yes\" target=\"_blank\"><img src=\"static/image/common/qq_big.gif\" border=\"0\"></a>','[qq]688888[/qq]','显示 QQ 在线状态，点这个图标可以和他（她）聊天','1','请输入 QQ 号码:<a href=\"\" class=\"xi2\" onclick=\"this.href=\'http://wp.qq.com/set.html?from=discuz&uin=\'+$(\'e_cst1_qq_param_1\').value\" target=\"_blank\" style=\"float:right;\">设置QQ在线状态&nbsp;&nbsp;</a>','1','21','1	2	3	10	11	12	13	14	15	16	17	18	19');");
 		}
 
 		show_msg("布局方案设置升级完毕", "$theurl?step=data&op=$nextop");
@@ -1741,12 +1690,16 @@ if($_GET['step'] == 'start') {
 	} elseif($_GET['op'] == 'notification') {
 		$nextop = 'medal';
 		if(!DB::result_first("SELECT id FROM ".DB::table('home_notification')." WHERE category>0")) {
+			$_G['notice_structure']['follow'] = array('follow');
+			$_G['notice_structure']['follower'] = array('follower');
 			foreach($_G['notice_structure'] as $key => $val) {
 				switch ($key) {
 					case 'mypost' : $category = 1; break;
 					case 'interactive' : $category = 2; break;
 					case 'system' : $category = 3; break;
 					case 'manage' : $category = 4; break;
+					case 'follow' : $category = 5; break;
+					case 'follower' : $category = 6; break;
 					default :  $category = 0;
 				}
 				if($category) {
@@ -1769,8 +1722,8 @@ if($_GET['step'] == 'start') {
 				foreach($medals as $medalid) {
 					$medalid = intval($medalid);
 					DB::insert('common_member_medal', array(
-						'uid' => $member['uid'],
-						'medalid' => $medalid
+					    'uid' => $member['uid'],
+					    'medalid' => $medalid
 					), 0, 1);
 				}
 			}
@@ -1917,7 +1870,24 @@ if($_GET['step'] == 'start') {
 	show_msg("默认风格已恢复，进入下一步", "$theurl?step=cache");
 
 } elseif ($_GET['step'] == 'cache') {
+	$appService = Cloud::loadClass('Service_App');
+	try {
+		$cloudstatus = $appService->checkCloudStatus();
+	} catch (Exception $e) {
+	}
+	$result = false;
+	if($cloudstatus == 'cloud' && !$appService->getCloudAppStatus('search')) {
+		try{
+			$cloudAppService = Cloud::loadClass('Service_Client_Cloud');
+			$result = $cloudAppService->appOpen();
+		} catch(Exception $e) {
+		}
+	}
 
+
+	if($result == true) {
+		$opensoso = '<br><br>友情提示：<br>为更好的降低论坛搜索时的数据压力，本次升级已经帮本站开通纵横搜索服务。<br>你可以在 <a href=\\\'../admin.php?frames=yes&action=cloud&operation=search\\\' target=\\\'_blank\\\'>站点后台-&gt;云平台-&gt;纵横搜索 进行管理</a>。';
+	}
 	if(!$devmode && @$fp = fopen($lockfile, 'w')) {
 		fwrite($fp, ' ');
 		fclose($fp);
@@ -1933,7 +1903,7 @@ if($_GET['step'] == 'start') {
 	if($_GET['from']) {
 		show_msg('<span id="finalmsg">缓存更新中，请稍候 ...</span><iframe src="../misc.php?mod=initsys" style="display:none;" onload="window.location.href=\''.$_GET['from'].'\'"></iframe>');
 	} else {
-		show_msg('<span id="finalmsg">缓存更新中，请稍候 ...</span><iframe src="../misc.php?mod=initsys" style="display:none;" onload="document.getElementById(\'finalmsg\').innerHTML = \'恭喜，数据库结构升级完成！为了数据安全，请删除本文件。\'"></iframe>');
+		show_msg('<span id="finalmsg">缓存更新中，请稍候 ...</span><iframe src="../misc.php?mod=initsys" style="display:none;" onload="document.getElementById(\'finalmsg\').innerHTML = \'恭喜，数据库结构升级完成！为了数据安全，请删除本文件。'.$opensoso.'\'"></iframe>');
 	}
 
 }

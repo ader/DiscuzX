@@ -2,7 +2,7 @@
 	[Discuz!] (C)2001-2099 Comsenz Inc.
 	This is NOT a freeware, use is subject to license terms
 
-	$Id: common.js 32718 2013-03-04 09:21:06Z zhangguosheng $
+	$Id: common.js 33139 2013-04-27 08:49:04Z kamichen $
 */
 
 var BROWSER = {};
@@ -691,7 +691,7 @@ function ajaxpost(formid, showid, waitid, showidclass, submitbtn, recall) {
 		}
 		if(!evaled) evalscript(s);
 		ajaxframe.loading = 0;
-		if(!BROWSER.firefox) {
+		if(!BROWSER.firefox || BROWSER.safari) {
 			$('append_parent').removeChild(ajaxframe.parentNode);
 		} else {
 			setTimeout(
@@ -1365,7 +1365,7 @@ function showTip(ctrlobj) {
 	$F('_showTip', arguments);
 }
 
-function showPrompt(ctrlid, evt, msg, timeout) {
+function showPrompt(ctrlid, evt, msg, timeout, classname) {
 	$F('_showPrompt', arguments);
 }
 
@@ -1390,7 +1390,7 @@ function showDialog(msg, mode, t, func, cover, funccancel, leftmsg, confirmtxt, 
 		hideMenu(menuid, 'dialog');
 	};
 	if(closetime) {
-		showPrompt(null, null, '<i>' + msg + '</i>', closetime * 1000);
+		showPrompt(null, null, '<i>' + msg + '</i>', closetime * 1000, 'popuptext');
 		return;
 	}
 	locationtime = isUndefined(locationtime) ? '' : locationtime;
@@ -1992,6 +1992,10 @@ function createPalette(colorid, id, func) {
 
 function showForummenu(fid) {
 	$F('_showForummenu', arguments);
+}
+
+function showUserApp() {
+	$F('_showUserApp', arguments);
 }
 
 function cardInit() {
