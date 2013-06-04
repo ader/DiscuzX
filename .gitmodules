@@ -7,9 +7,6 @@
 [submodule "uc_client"]
 	path = uc_client
 	url = git@github.com:DPSDiscuzX/dps_uc_client.git
-[submodule "source/plugin/dps_exadmincp"]
-	path = source/plugin/dps_exadmincp
-	url = git@github.com:DPSDiscuzX/dps_exadmincp.git
 [submodule "template/yeei_dream"]
 	path = template/yeei_dream
 	url = git@github.com:DPSDiscuzX/yeei_dream.git
